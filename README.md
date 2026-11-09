@@ -1,0 +1,63 @@
+# OcuNova — Revival Workspace
+
+OcuNova is being developed as an AI-assisted, interactive engineering and learning workspace.
+
+## Repository status
+
+This repository currently contains a single-file browser prototype in `index.html`.
+
+The existing prototype is titled **NEON AURA AR** and includes:
+- MediaPipe Hands-based hand landmark tracking
+- Canvas-based visual effects and particle animations
+- Several visual themes
+- Basic pinch/open-hand gesture feedback
+- Optional generated audio effects
+
+This is a useful interaction experiment, but it is not yet the complete OcuNova engineering simulation platform.
+
+## Revival direction
+
+The goal is to evolve the prototype into OcuNova while preserving the original experiment until a replacement is tested.
+
+### Planned development stages
+
+1. **Foundation**
+   - Establish OcuNova branding, responsive layout, and accessible navigation.
+   - Separate the interface, hand-tracking, rendering, and simulation code into maintainable modules.
+   - Add clear camera-permission, loading, and error states.
+
+2. **Interactive 3D workspace**
+   - Add a 3D scene with selectable, movable, and zoomable models.
+   - Provide a project panel with model details and editable properties.
+   - Keep gesture interaction optional; provide mouse and touch controls too.
+
+3. **Engineering learning tools**
+   - Add learning-focused circuit and component views.
+   - Build a searchable component and sensor reference library.
+   - Add guided simulation lessons and project explanations.
+
+4. **AI-assisted creation**
+   - Design a prompt-to-project workflow with clear preview and edit steps.
+   - Show generated content before applying changes.
+   - Keep AI/API credentials on a secure server, never in browser source code.
+
+5. **Project exports**
+   - Add project summaries and exportable documentation.
+   - Test PDF/PPT generation and verify exported files before release.
+
+## Development principles
+
+- Preserve existing work and use feature branches for major changes.
+- Do not claim a feature is complete until it has been implemented and tested.
+- Ask for camera permission only when the user starts a camera-based feature.
+- Explain what camera data is used for and avoid storing or uploading it by default.
+- Support keyboard, touch, and pointer interaction alongside gestures.
+- Keep secrets, private keys, and API tokens out of the repository.
+
+## Current entry point
+
+Open `index.html` to run the existing hand-tracking visual prototype in a browser environment that supports camera access.
+
+## Project ownership
+
+OcuNova project concept and development direction: **Mohd Arhan Salmani**.
