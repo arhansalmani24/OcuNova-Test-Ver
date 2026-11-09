@@ -4,62 +4,44 @@ OcuNova is being developed as an AI-assisted, interactive engineering and learni
 
 ## Repository status
 
-This repository currently contains a single-file browser prototype in `index.html`.
-
-The existing prototype is titled **NEON AURA AR** and includes:
-- MediaPipe Hands-based hand landmark tracking
-- Canvas-based visual effects and particle animations
-- Several visual themes
-- Basic pinch/open-hand gesture feedback
-- Optional generated audio effects
-
-This is a useful interaction experiment, but it is not yet the complete OcuNova engineering simulation platform.
-
-## Revival direction
-
-The goal is to evolve the prototype into OcuNova while preserving the original experiment until a replacement is tested.
-
-### Planned development stages
-
-1. **Foundation**
-   - Establish OcuNova branding, responsive layout, and accessible navigation.
-   - Separate the interface, hand-tracking, rendering, and simulation code into maintainable modules.
-   - Add clear camera-permission, loading, and error states.
-
-2. **Interactive 3D workspace**
-   - Add a 3D scene with selectable, movable, and zoomable models.
-   - Provide a project panel with model details and editable properties.
-   - Keep gesture interaction optional; provide mouse and touch controls too.
-
-3. **Engineering learning tools**
-   - Add learning-focused circuit and component views.
-   - Build a searchable component and sensor reference library.
-   - Add guided simulation lessons and project explanations.
-
-4. **AI-assisted creation**
-   - Design a prompt-to-project workflow with clear preview and edit steps.
-   - Show generated content before applying changes.
-   - Keep AI/API credentials on a secure server, never in browser source code.
-
-5. **Project exports**
-   - Add project summaries and exportable documentation.
-   - Test PDF/PPT generation and verify exported files before release.
-
-## Development principles
-
-- Preserve existing work and use feature branches for major changes.
-- Do not claim a feature is complete until it has been implemented and tested.
-- Ask for camera permission only when the user starts a camera-based feature.
-- Explain what camera data is used for and avoid storing or uploading it by default.
-- Support keyboard, touch, and pointer interaction alongside gestures.
-- Keep secrets, private keys, and API tokens out of the repository.
+The original `index.html` experiment is preserved. Development prototypes are being added on the `ocunova-revival` branch; the default `main` branch is intentionally left unchanged.
 
 ## Current entry points
 
-- Open `circuit-forge.html` to try the Circuit Forge prototype: add and move sample components, connect visual ports, use prompt-based demo layouts, and export a project JSON. Connections are not electrically validated and the prompt helper is not connected to an AI model.\n- Open `workspace.html` to try the new OcuNova-branded interactive 3D workspace prototype. It supports orbit controls, selecting objects, editing position/scale/color, adding primitive shapes, and exporting a scene description as JSON. Three.js is loaded from a CDN, so an internet connection is required.
-- Open `index.html` to run the original hand-tracking visual prototype in a browser environment that supports camera access.
+- `index.html` — original **NEON AURA AR** visual experiment with MediaPipe Hands tracking, Canvas effects, gesture feedback, themes and optional audio. Camera access depends on browser permissions and a compatible environment.
+- `workspace.html` — OcuNova interactive 3D workspace with orbit controls, object selection, primitive creation, editable transforms/materials and JSON scene export. Three.js is loaded from a CDN.
+- `model-studio.html` — 3D Model Studio with a component library, scene layers, sample rover assembly, editable object properties and JSON export. Three.js is loaded from a CDN.
+- `circuit-forge.html` — visual circuit-layout prototype with Arduino-style components, draggable parts, port-to-port visual wires, sample prompt layouts and JSON export. Connections are not electrically validated; the prompt helper is not an AI service.
+- `physics-lab.html` — browser-based 2D teaching playground for free fall, ramp motion and bouncing, with adjustable gravity, mass, friction and restitution, live approximate measurements, a speed-history graph and CSV export.
 
-The prompt box in `workspace.html` currently maps simple descriptions to built-in 3D primitives. It is a local demo, not a connected AI model or full engineering simulator.
+## Physics Lab scope and limitations
+
+The Physics Lab is a simplified educational approximation, not a validated scientific or engineering solver. It does not model full 3D motion, rotational dynamics, detailed material behaviour or air-flow physics. Its ramp and collision behaviour is intentionally basic. Treat displayed readings as learning aids, not design or safety calculations. The mass control changes displayed energy; ideal gravitational acceleration is independent of mass in this model.
+
+## Revival roadmap
+
+1. Improve the shared app foundation, responsive navigation and accessibility.
+2. Connect the 3D workspace and model studio through a consistent project format.
+3. Expand the component and sensor reference library with grounded specifications.
+4. Build a more complete, validated simulation layer and guided lessons.
+5. Add secure AI-assisted project generation only when a server-side integration is available.
+6. Add verified PDF/PPT project documentation exports.
+
+## Development and privacy principles
+
+- Preserve the original experiment and work on `ocunova-revival` until changes are explicitly approved for integration.
+- Distinguish prototypes, local demos, external services and validated simulations clearly.
+- Do not claim a feature is complete until it has been implemented and tested.
+- Request camera access only when the user starts a camera-based feature; explain its purpose and avoid storing or uploading camera data by default.
+- Support pointer, touch and keyboard interaction where practical.
+- Never place API keys, private keys or other secrets in browser source code.
+
+## Verification status
+
+- Source files and commits are present on the `ocunova-revival` branch.
+- The Physics Lab source was fetched back from GitHub and checked for its experiment controls, run/pause logic, CSV export and model-limitations note.
+- This is source-level verification only. The new Physics Lab has not yet been browser-tested across devices or independently validated against a physics reference.
+- The Three.js prototypes require a browser with WebGL and network access to their CDN dependencies.
 
 ## Project ownership
 
