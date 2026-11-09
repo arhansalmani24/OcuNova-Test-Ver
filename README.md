@@ -56,7 +56,7 @@ The goal is to evolve the prototype into OcuNova while preserving the original e
 
 ## Current entry points
 
-- Open `workspace.html` to try the new OcuNova-branded interactive 3D workspace prototype. It supports orbit controls, selecting objects, editing position/scale/color, adding primitive shapes, and exporting a scene description as JSON. Three.js is loaded from a CDN, so an internet connection is required.
+- Open `circuit-forge.html` to try the Circuit Forge prototype: add and move sample components, connect visual ports, use prompt-based demo layouts, and export a project JSON. Connections are not electrically validated and the prompt helper is not connected to an AI model.\n- Open `workspace.html` to try the new OcuNova-branded interactive 3D workspace prototype. It supports orbit controls, selecting objects, editing position/scale/color, adding primitive shapes, and exporting a scene description as JSON. Three.js is loaded from a CDN, so an internet connection is required.
 - Open `index.html` to run the original hand-tracking visual prototype in a browser environment that supports camera access.
 
 The prompt box in `workspace.html` currently maps simple descriptions to built-in 3D primitives. It is a local demo, not a connected AI model or full engineering simulator.
