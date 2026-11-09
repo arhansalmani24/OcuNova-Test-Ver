@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f4f9ff">
+<title>OcuNova — Physics Lab</title>
+<style>
+:root{--ink:#17324b;--muted:#71869a;--blue:#2679e8;--cyan:#24c7d4;--line:#dce9f4;--bg:#f3f8fd;--card:#ffffffd9}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,#e3f4ff,transparent 34%),radial-gradient(circle at 90% 12%,#e5fbff,transparent 30%),var(--bg);font:14px Inter,system-ui,sans-serif;color:var(--ink)}
+button,input{font:inherit}button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;padding:9px 12px;font-weight:650}button:hover{border-color:#8fc5f6;background:#f5fbff}button:focus-visible,input:focus-visible{outline:3px solid #83baff;outline-offset:2px}
+header{height:68px;padding:0 24px;display:flex;align-items:center;justify-content:space-between;background:#ffffffb8;border-bottom:1px solid var(--line);backdrop-filter:blur(16px);position:sticky;top:0;z-index:4}
+.brand{font-size:21px;font-weight:850;letter-spacing:.04em}.brand span{color:var(--blue)}.sub{font-size:10px;color:var(--muted);letter-spacing:.16em;margin-top:3px}.tag{font-size:11px;color:#247b69;background:#e9f8f2;border:1px solid #d1efe3;border-radius:30px;padding:7px 11px}
+main{max-width:1450px;margin:auto;padding:20px;display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:16px}
+.intro{grid-column:1/-1;display:flex;justify-content:space-between;align-items:end;gap:20px}.eyebrow{font-size:10px;letter-spacing:.18em;color:var(--blue);font-weight:800;text-transform:uppercase}.intro h1{font-size:clamp(26px,3vw,37px);letter-spacing:-1.2px;margin:6px 0}.intro p{margin:0;color:var(--muted);line-height:1.5}.local{font-size:11px;color:#668097;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 34px #315d7a0b;backdrop-filter:blur(14px);overflow:hidden}.stage{min-width:0}.stagebar{padding:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;border-bottom:1px solid var(--line)}.stagebar .spacer{flex:1}.primary{background:linear-gradient(110deg,var(--blue),var(--cyan));color:white;border:0}.primary:hover{filter:brightness(.96);background:linear-gradient(110deg,var(--blue),var(--cyan))}.active{background:#eaf4ff;border-color:#b9d8ff;color:#176ac6}
+#world{display:block;width:100%;height:450px;background:linear-gradient(#fafdff,#eef7ff);touch-action:pan-y}.stagefoot{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+.side{display:flex;flex-direction:column;gap:14px}.panel{padding:16px}.panel h2{font-size:14px;margin:0 0 5px}.desc{font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 13px}.field{margin:13px 0}.fieldtop{display:flex;justify-content:space-between;gap:8px;font-size:12px;margin-bottom:7px}.fieldtop output{color:#286fc9;font-weight:750;font-variant-numeric:tabular-nums}input[type=range]{width:100%;accent-color:var(--blue)}.rangeends{display:flex;justify-content:space-between;color:#91a1b2;font-size:10px;margin-top:3px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px}.metric{background:#f4f9fe;border:1px solid #e5eff8;border-radius:12px;padding:10px}.metric small{display:block;color:var(--muted);font-size:10px}.metric strong{display:block;font-size:18px;margin-top:4px;font-variant-numeric:tabular-nums}
+.experiments{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.experiment{font-size:11px;padding:10px 5px}.experiment span{display:block;font-size:18px;margin-bottom:5px}
+.chartwrap{height:110px;background:#f8fbff;border:1px solid #e5eff8;border-radius:12px;padding:8px}.chartwrap canvas{width:100%;height:100%;display:block}
+.note{padding:10px 11px;border-radius:11px;background:#eef8ff;color:#55738d;font-size:10px;line-height:1.55}.note strong{color:#285c8d}
+@media(max-width:950px){main{grid-template-columns:minmax(0,1fr) 280px;padding:14px}.intro{grid-column:1/-1}}
+@media(max-width:720px){header{padding:0 14px}.tag{display:none}main{display:flex;flex-direction:column;padding:11px}.intro{align-items:flex-start;flex-direction:column}.local{display:none}#world{height:360px}.side{display:grid;grid-template-columns:1fr 1fr}.side .panel:last-child{grid-column:1/-1}}
+@media(max-width:460px){.side{display:flex}.stagebar button{padding:8px 9px;font-size:11px}.stagefoot{flex-direction:column}#world{height:320px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">Ocu<span>Nova</span></div><div class="sub">PHYSICS LAB · EXPERIMENT / OBSERVE / LEARN</div></div><span class="tag">● Interactive learning prototype</span></header>
+<main>
+<section class="intro"><div><div class="eyebrow">Explore motion</div><h1>Physics, made interactive.</h1><p>Change the conditions, run an experiment and observe how an object moves.</p></div><span class="local">Runs locally in your browser · No sign-in</span></section>
+<section class="card stage">
+ <div class="stagebar">
+  <button id="play" class="primary">▶ Run</button><button id="step">Step</button><button id="reset">↺ Reset</button>
+  <span class="spacer"></span><button id="drop">Drop object</button><button id="export">Export data</button>
+ </div>
+ <canvas id="world" aria-label="Physics experiment showing a ball moving under gravity"></canvas>
+ <div class="stagefoot"><span id="state">Ready · choose an experiment</span><span>Drag the ball before running to set its starting position</span></div>
+</section>
+<aside class="side">
+ <section class="card panel"><h2>Experiment setup</h2><p class="desc">Adjust one variable at a time to compare outcomes.</p>
+  <div class="field"><div class="fieldtop"><label for="gravity">Gravity</label><output id="gravityOut">9.8 m/s²</output></div><input id="gravity" type="range" min="0" max="25" step=".1" value="9.8"><div class="rangeends"><span>0</span><span>25 m/s²</span></div></div>
+  <div class="field"><div class="fieldtop"><label for="mass">Mass</label><output id="massOut">1.0 kg</output></div><input id="mass" type="range" min=".2" max="5" step=".1" value="1"><div class="rangeends"><span>0.2</span><span>5 kg</span></div></div>
+  <div class="field"><div class="fieldtop"><label for="friction">Surface friction</label><output id="frictionOut">0.25</output></div><input id="friction" type="range" min="0" max="1" step=".01" value=".25"><div class="rangeends"><span>Low</span><span>High</span></div></div>
+  <div class="field"><div class="fieldtop"><label for="bounce">Bounciness</label><output id="bounceOut">0.55</output></div><input id="bounce" type="range" min="0" max="1" step=".01" value=".55"><div class="rangeends"><span>No bounce</span><span>High bounce</span></div></div>
+ </section>
+ <section class="card panel"><h2>Choose an experiment</h2><p class="desc">Each experiment resets the object and track.</p><div class="experiments">
+  <button class="experiment active" data-mode="drop"><span>⬇</span>Free fall</button><button class="experiment" data-mode="ramp"><span>／</span>Ramp</button><button class="experiment" data-mode="bounce"><span>◉</span>Bounce</button>
+ </div></section>
+ <section class="card panel"><h2>Live measurements</h2><p class="desc">Approximate values from this simplified model.</p><div class="metrics">
+  <div class="metric"><small>Time</small><strong id="time">0.00 s</strong></div><div class="metric"><small>Speed</small><strong id="speed">0.00 m/s</strong></div>
+  <div class="metric"><small>Height</small><strong id="height">4.00 m</strong></div><div class="metric"><small>Energy*</small><strong id="energy">39.2 J</strong></div>
+ </div></section>
+ <section class="card panel"><h2>Speed over time</h2><p class="desc">Recent speed readings during this run.</p><div class="chartwrap"><canvas id="chart" aria-label="Line graph of speed over time"></canvas></div></section>
+ <section class="note"><strong>Model note:</strong> This is an educational 2D approximation, not a validated engineering or scientific solver. Mass affects the displayed energy, but not ideal gravitational acceleration. Air resistance, 3D rotation and detailed material behaviour are not modelled. <strong>*Energy</strong> is an approximate teaching value.</section>
+</aside>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),chart=$('chart'),gctx=chart.getContext('2d');
+const controls={gravity:$('gravity'),mass:$('mass'),friction:$('friction'),bounce:$('bounce')};
+let mode='drop',running=false,t=0,ball={x:150,y:90,vx:0,vy:0,r:17},samples=[],last=0,raf=0,dragging=false;
+const floorY=390,scale=70;
+function values(){return{g:+controls.gravity.value,m:+controls.mass.value,f:+controls.friction.value,e:+controls.bounce.value}}
+function resize(){const dpr=Math.min(devicePixelRatio||1,2),w=canvas.clientWidth,h=canvas.clientHeight;canvas.width=Math.round(w*dpr);canvas.height=Math.round(h*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);draw();const r=chart.getBoundingClientRect();chart.width=Math.max(1,Math.round(r.width*dpr));chart.height=Math.max(1,Math.round(r.height*dpr));gctx.setTransform(dpr,0,0,dpr,0,0);drawChart()}
+function ramp(){return{x1:Math.max(35,canvas.clientWidth*.18),y1:canvas.clientHeight*.48,x2:canvas.clientWidth*.82,y2:canvas.clientHeight*.78}}
+function reset(){running=false;t=0;samples=[];const w=canvas.clientWidth,h=canvas.clientHeight;ball={x:mode==='ramp'?w*.22:w*.28,y:mode==='ramp'?h*.30:Math.max(65,h*.2),vx:0,vy:0,r:17};if(mode==='bounce')ball.y=h*.17;update();draw();drawChart();$('play').textContent='▶ Run';$('state').textContent='Ready · '+label(mode)}
+const label=m=>m==='drop'?'Free fall':m==='ramp'?'Ramp motion':'Bounce test';
+function setMode(m){mode=m;document.querySelectorAll('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===m));reset()}
+function groundCollision(){const h=canvas.clientHeight,w=canvas.clientWidth;if(mode==='ramp'){const a=ramp(),dx=a.x2-a.x1,dy=a.y2-a.y1,len=Math.hypot(dx,dy),tx=dx/len,ty=dy/len,nx=dy/len,ny=-dx/len,rx=ball.x-a.x1,ry=ball.y-a.y1,along=rx*tx+ry*ty,dist=rx*nx+ry*ny;if(along>=0&&along<=len&&dist<ball.r){ball.x+=(ball.r-dist)*nx;ball.y+=(ball.r-dist)*ny;const vn=ball.vx*nx+ball.vy*ny;if(vn<0){ball.vx-=(1+values().e)*vn*nx;ball.vy-=(1+values().e)*vn*ny}const vt=ball.vx*tx+ball.vy*ty,loss=Math.min(1,values().f*.08);ball.vx-=vt*loss*tx;ball.vy-=vt*loss*ty;}}
+const floor=mode==='ramp'?h*.88:h*.84;if(ball.y+ball.r>floor){ball.y=floor-ball.r;if(ball.vy>0){ball.vy=-ball.vy*values().e;ball.vx*=1-values().f*.07;if(Math.abs(ball.vy)<.22)ball.vy=0;if(Math.abs(ball.vx)<.04)ball.vx=0}}if(ball.x<ball.r){ball.x=ball.r;ball.vx=Math.abs(ball.vx)*values().e}if(ball.x>w-ball.r){ball.x=w-ball.r;ball.vx=-Math.abs(ball.vx)*values().e}}
+function simulate(dt){const v=values();const sub=4,step=dt/sub;for(let i=0;i<sub;i++){ball.vy+=v.g*scale*step;if(mode==='ramp'&&ball.y>canvas.clientHeight*.35)ball.vx+=v.g*scale*.48*step;const drag=Math.max(0,1-(.012+v.f*.035)*step*60);ball.vx*=drag;ball.vy*=Math.max(0,1-.004*step*60);ball.x+=ball.vx*step;ball.y+=ball.vy*step;groundCollision()}t+=dt;samples.push({t,speed:Math.hypot(ball.vx,ball.vy)/scale});if(samples.length>90)samples.shift();update()}
+function update(){const v=values(),height=Math.max(0,(canvas.clientHeight*.84-ball.y-ball.r)/scale),speed=Math.hypot(ball.vx,ball.vy)/scale,energy=.5*v.m*speed*speed+v.m*v.g*height;$('time').textContent=t.toFixed(2)+' s';$('speed').textContent=speed.toFixed(2)+' m/s';$('height').textContent=height.toFixed(2)+' m';$('energy').textContent=energy.toFixed(1)+' J';Object.entries(controls).forEach(([k,c])=>{$(k+'Out').textContent=k==='gravity'?v.g.toFixed(1)+' m/s²':k==='mass'?v.m.toFixed(1)+' kg':v[k].toFixed(2)});drawChart()}
+function draw(){const w=canvas.clientWidth,h=canvas.clientHeight;if(!w||!h)return;ctx.clearRect(0,0,w,h);const grad=ctx.createLinearGradient(0,0,0,h);grad.addColorStop(0,'#fbfdff');grad.addColorStop(1,'#eaf5ff');ctx.fillStyle=grad;ctx.fillRect(0,0,w,h);
+ctx.strokeStyle='#e1edf7';ctx.lineWidth=1;for(let x=0;x<w;x+=35){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()}for(let y=0;y<h;y+=35){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+const floor=mode==='ramp'?h*.88:h*.84;ctx.strokeStyle='#8eabc4';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(0,floor);ctx.lineTo(w,floor);ctx.stroke();
+if(mode==='ramp'){const a=ramp();ctx.strokeStyle='#4389c9';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a.x1,a.y1);ctx.lineTo(a.x2,a.y2);ctx.stroke();ctx.lineCap='butt';ctx.fillStyle='#cce7fb';ctx.beginPath();ctx.moveTo(a.x1,a.y1);ctx.lineTo(a.x2,a.y2);ctx.lineTo(a.x2,floor);ctx.lineTo(a.x1,floor);ctx.closePath();ctx.globalAlpha=.35;ctx.fill();ctx.globalAlpha=1}
+ctx.fillStyle='#718ba3';ctx.font='11px system-ui';ctx.fillText(mode==='ramp'?'Inclined plane':'Reference floor',12,floor+18);
+ctx.save();ctx.shadowColor='#3984c955';ctx.shadowBlur=18;ctx.shadowOffsetY=7;const gr=ctx.createRadialGradient(ball.x-6,ball.y-7,2,ball.x,ball.y,ball.r+2);gr.addColorStop(0,'#aaf6ff');gr.addColorStop(.4,'#3dc5d7');gr.addColorStop(1,'#2776df');ctx.fillStyle=gr;ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r,0,Math.PI*2);ctx.fill();ctx.restore();ctx.strokeStyle='#ffffff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(ball.x,ball.y,ball.r-3,0,Math.PI*2);ctx.stroke();
+if(running){ctx.strokeStyle='#2679e8';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ball.x,ball.y);ctx.lineTo(ball.x+ball.vx*.18,ball.y+ball.vy*.18);ctx.stroke()}}
+function drawChart(){if(!chart.clientWidth)return;const w=chart.clientWidth,h=chart.clientHeight;gctx.clearRect(0,0,w,h);gctx.strokeStyle='#e4edf6';gctx.lineWidth=1;for(let y=15;y<h;y+=25){gctx.beginPath();gctx.moveTo(0,y);gctx.lineTo(w,y);gctx.stroke()}if(samples.length<2)return;const max=Math.max(2,...samples.map(s=>s.speed))*1.15;gctx.beginPath();samples.forEach((s,i)=>{const x=i/(Math.max(1,samples.length-1))*w,y=h-8-s.speed/max*(h-18);i?gctx.lineTo(x,y):gctx.moveTo(x,y)});gctx.strokeStyle='#2679e8';gctx.lineWidth=2.5;gctx.stroke();gctx.lineTo(w,h);gctx.lineTo(0,h);gctx.closePath();gctx.fillStyle='#2679e817';gctx.fill()}
+function frame(now){if(!running)return;const dt=Math.min(.04,(now-last)/1000||0);last=now;if(dt>0)simulate(dt);draw();raf=requestAnimationFrame(frame)}
+function play(){running=!running;$('play').textContent=running?'Ⅱ Pause':'▶ Run';$('state').textContent=running?'Experiment running · '+label(mode):'Paused · '+label(mode);if(running){last=performance.now();raf=requestAnimationFrame(frame)}else cancelAnimationFrame(raf)}
+$('play').onclick=play;$('reset').onclick=reset;$('drop').onclick=()=>{reset();ball.vy=0;ball.y=Math.max(45,canvas.clientHeight*.12);draw()};$('step').onclick=()=>{if(running){running=false;cancelAnimationFrame(raf);$('play').textContent='▶ Run'}simulate(1/30);draw();$('state').textContent='Advanced one small time step'};
+document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>setMode(b.dataset.mode));Object.values(controls).forEach(c=>c.addEventListener('input',()=>{update();draw()}));
+canvas.addEventListener('pointerdown',e=>{const r=canvas.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;if(Math.hypot(x-ball.x,y-ball.y)<ball.r+14&&!running){dragging=true;canvas.setPointerCapture(e.pointerId)}});canvas.addEventListener('pointermove',e=>{if(!dragging)return;const r=canvas.getBoundingClientRect();ball.x=Math.max(ball.r,Math.min(canvas.clientWidth-ball.r,e.clientX-r.left));ball.y=Math.max(ball.r,Math.min(canvas.clientHeight*.8-ball.r,e.clientY-r.top));draw();update()});canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
+$('export').onclick=()=>{const rows=[['time_s','speed_m_s'],...samples.map(s=>[s.t.toFixed(3),s.speed.toFixed(4)])];const csv=rows.map(r=>r.join(',')).join('\n');const a=document.createElement('a'),url=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.href=url;a.download='ocunova-physics-readings.csv';a.click();URL.revokeObjectURL(url);$('state').textContent='Readings exported as CSV'};
+new ResizeObserver(resize).observe(canvas);new ResizeObserver(()=>{const dpr=Math.min(devicePixelRatio||1,2),r=chart.getBoundingClientRect();chart.width=Math.max(1,Math.round(r.width*dpr));chart.height=Math.max(1,Math.round(r.height*dpr));gctx.setTransform(dpr,0,0,dpr,0,0);drawChart()}).observe(chart);
+resize();reset();
+})();
+</script>
+</body></html>
