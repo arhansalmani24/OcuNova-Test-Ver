@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OcuNova — 3D Model Studio</title>
+<style>
+:root{--ink:#16304a;--muted:#71869a;--blue:#247fe8;--cyan:#25c8d8;--line:#dce9f4;--glass:rgba(255,255,255,.82);--bg:#f3f8fc}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 15% 5%,#e3f4ff,transparent 34%),radial-gradient(circle at 85% 15%,#e9f8ff,transparent 30%),var(--bg);font:14px Inter,system-ui,sans-serif;color:var(--ink)}
+header{height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:1px solid var(--line);background:#ffffffb8;backdrop-filter:blur(18px);position:sticky;top:0;z-index:5}
+.brand{font-size:21px;font-weight:850;letter-spacing:.08em}.brand span{color:var(--blue)}.sub{font-size:11px;color:var(--muted);letter-spacing:.15em;margin-top:3px}
+.actions{display:flex;gap:8px;flex-wrap:wrap}button,select,input{font:inherit}button{border:1px solid var(--line);background:white;color:var(--ink);padding:9px 12px;border-radius:11px;cursor:pointer;font-weight:650}button:hover{border-color:#8fc5f6;background:#f5fbff}.primary{background:linear-gradient(110deg,var(--blue),var(--cyan));color:white;border:0}.danger{color:#c24e5d}
+main{display:grid;grid-template-columns:220px minmax(300px,1fr) 250px;gap:14px;padding:14px;max-width:1600px;margin:auto;min-height:calc(100vh - 68px)}
+.panel{background:var(--glass);border:1px solid #dce9f4;border-radius:18px;box-shadow:0 12px 34px #315d7a0c;backdrop-filter:blur(16px);overflow:hidden}
+.panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.13em;color:#678097;margin:0;padding:16px 15px 10px}
+.library{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px 12px 14px}.part{padding:12px 7px;border:1px solid var(--line);border-radius:13px;text-align:center;background:#fff;cursor:pointer}.part:hover{border-color:#74bafa;transform:translateY(-1px)}.part .emoji{font-size:23px;display:block;margin-bottom:6px}.part small{color:var(--muted);font-size:11px}
+.stage{display:flex;flex-direction:column;min-width:0}.toolbar{padding:10px;display:flex;gap:7px;align-items:center;flex-wrap:wrap}.toolbar .hint{margin-left:auto;color:var(--muted);font-size:11px}#viewport{height:min(67vh,690px);min-height:390px;position:relative;background:linear-gradient(145deg,#fafdff,#e9f5ff);border-radius:16px;overflow:hidden;border:1px solid var(--line)}canvas{display:block;width:100%;height:100%}.stagefoot{display:flex;justify-content:space-between;padding:10px 4px;color:var(--muted);font-size:11px}
+.section{padding:0 14px 15px}.field{display:grid;grid-template-columns:1fr 92px;gap:8px;align-items:center;margin:8px 0}.field label{font-size:12px;color:#627b91}.field input{width:100%;padding:7px;border:1px solid var(--line);border-radius:8px;background:white;color:var(--ink)}input[type=color]{height:34px;padding:3px}
+.layers{padding:4px 10px 14px}.layer{display:flex;align-items:center;gap:8px;padding:9px;border-radius:9px;font-size:12px;cursor:pointer}.layer.active{background:#e8f4ff;color:#176dc4}.layer button{margin-left:auto;padding:3px 7px;font-size:11px}
+.note{margin:10px 12px 14px;padding:10px;border-radius:11px;background:#eef8ff;color:#5c7790;font-size:11px;line-height:1.5}
+@media(max-width:950px){main{grid-template-columns:180px minmax(280px,1fr)}.right{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.right .panel{min-width:0}}
+@media(max-width:650px){header{padding:0 12px}.brand{font-size:17px}main{display:flex;flex-direction:column;padding:9px}.left{order:2}.stage{order:1}.right{order:3;display:block}#viewport{height:54vh;min-height:330px}.library{grid-template-columns:repeat(4,1fr)}.part{padding:9px 3px}.part .emoji{font-size:19px}.actions button{padding:7px 9px;font-size:11px}}
+</style>
+</head>
+<body>
+<header><div><div class="brand">Ocu<span>Nova</span></div><div class="sub">3D MODEL STUDIO · BUILD / EXPLORE / LEARN</div></div><div class="actions"><button id="reset">Reset view</button><button id="export" class="primary">Export scene</button></div></header>
+<main>
+<aside class="panel left"><h3>Component library</h3><div class="library">
+<div class="part" data-kind="box"><span class="emoji">▰</span><small>Block</small></div><div class="part" data-kind="sphere"><span class="emoji">●</span><small>Sphere</small></div>
+<div class="part" data-kind="cylinder"><span class="emoji">⬭</span><small>Cylinder</small></div><div class="part" data-kind="cone"><span class="emoji">▲</span><small>Cone</small></div>
+<div class="part" data-kind="wheel"><span class="emoji">◉</span><small>Wheel</small></div><div class="part" data-kind="sensor"><span class="emoji">◈</span><small>Sensor</small></div>
+<div class="part" data-kind="board"><span class="emoji">▦</span><small>Control board</small></div><div class="part" data-kind="base"><span class="emoji">▱</span><small>Rover base</small></div>
+</div><div class="note">Choose a component to add it to the 3D scene. Select any object to edit its position, size and material.</div></aside>
+<section class="stage">
+<div class="panel toolbar"><button id="addRover" class="primary">＋ Build sample rover</button><button id="duplicate">Duplicate</button><button id="delete" class="danger">Delete</button><span class="hint">Drag to orbit · scroll to zoom · tap an object to select</span></div>
+<div id="viewport"></div><div class="stagefoot"><span id="status">Ready · 0 objects</span><span>OcuNova Studio / Preview build 0.2</span></div>
+</section>
+<aside class="right">
+<div class="panel"><h3>Scene layers</h3><div id="layers" class="layers"><div class="layer">No objects yet</div></div></div>
+<div class="panel"><h3>Object properties</h3><div class="section">
+<div class="field"><label>Object name</label><input id="objName" type="text" placeholder="—"></div>
+<div class="field"><label>Position X</label><input id="px" type="number" step=".1" value="0"></div><div class="field"><label>Position Y</label><input id="py" type="number" step=".1" value="0"></div><div class="field"><label>Position Z</label><input id="pz" type="number" step=".1" value="0"></div>
+<div class="field"><label>Scale</label><input id="scale" type="number" min=".1" max="5" step=".1" value="1"></div><div class="field"><label>Material</label><input id="color" type="color" value="#2588e8"></div>
+<button id="apply" class="primary" style="width:100%;margin-top:8px">Apply changes</button>
+</div></div>
+</aside>
+</main>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+const host=document.querySelector('#viewport'),scene=new THREE.Scene();scene.background=new THREE.Color('#edf7ff');
+const camera=new THREE.PerspectiveCamera(45,1,.1,100);camera.position.set(7,6,9);
+const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
+const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1,0);
+scene.add(new THREE.HemisphereLight(0xffffff,0x9bbbd1,2));const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(5,9,6);key.castShadow=true;scene.add(key);
+const grid=new THREE.GridHelper(18,36,0x9fc5df,0xd5e6f2);scene.add(grid);const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0xf4faff,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.025;ground.receiveShadow=true;scene.add(ground);
+let objects=[],selected=null;const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
+function material(color){return new THREE.MeshStandardMaterial({color,metalness:.22,roughness:.38})}
+function make(kind,name){let geo;let color='#2588e8';if(kind==='sphere')geo=new THREE.SphereGeometry(.65,32,24);else if(kind==='cylinder')geo=new THREE.CylinderGeometry(.5,.5,1.1,32);else if(kind==='cone')geo=new THREE.ConeGeometry(.6,1.2,32);else if(kind==='wheel'){geo=new THREE.CylinderGeometry(.58,.58,.28,32);color='#263b50'}else if(kind==='sensor'){geo=new THREE.BoxGeometry(.9,.35,.45);color='#18b7c8'}else if(kind==='board'){geo=new THREE.BoxGeometry(1.1,.16,.8);color='#1d9b78'}else if(kind==='base'){geo=new THREE.BoxGeometry(2.8,.35,1.8);color='#287ec5'}else geo=new THREE.BoxGeometry(1,1,1);
+const m=new THREE.Mesh(geo,material(color));m.name=name||kind[0].toUpperCase()+kind.slice(1);m.castShadow=true;m.receiveShadow=true;m.position.y=kind==='wheel'?.6:.6;m.userData.kind=kind;scene.add(m);objects.push(m);select(m);refresh();return m}
+function select(o){if(selected){selected.material.emissive?.setHex(0x000000)}selected=o;if(o){o.material.emissive?.setHex(0x17324a);o.material.emissiveIntensity=.12;document.querySelector('#objName').value=o.name;['x','y','z'].forEach((a,i)=>document.querySelector('#p'+a).value=o.position[['x','y','z'][i]].toFixed(2));document.querySelector('#scale').value=o.scale.x.toFixed(2);document.querySelector('#color').value='#'+o.material.color.getHexString()}refresh()}
+function refresh(){document.querySelector('#status').textContent='Ready · '+objects.length+' objects';const root=document.querySelector('#layers');root.innerHTML='';if(!objects.length)root.innerHTML='<div class="layer">No objects yet</div>';objects.forEach(o=>{const row=document.createElement('div');row.className='layer'+(o===selected?' active':'');row.textContent='◇ '+o.name;row.onclick=()=>select(o);root.appendChild(row)})}
+document.querySelectorAll('.part').forEach(el=>el.onclick=()=>make(el.dataset.kind));
+document.querySelector('#apply').onclick=()=>{if(!selected)return;selected.name=document.querySelector('#objName').value||selected.name;selected.position.set(+px.value,+py.value,+pz.value);selected.scale.setScalar(Math.max(.1,+scale.value||1));selected.material.color.set(color.value);refresh()};
+const px=document.querySelector('#px'),py=document.querySelector('#py'),pz=document.querySelector('#pz'),scale=document.querySelector('#scale'),color=document.querySelector('#color');
+document.querySelector('#duplicate').onclick=()=>{if(!selected)return;const c=selected.clone();c.material=selected.material.clone();c.position.x+=.7;c.name=selected.name+' copy';scene.add(c);objects.push(c);select(c)};
+document.querySelector('#delete').onclick=()=>{if(!selected)return;scene.remove(selected);objects=objects.filter(o=>o!==selected);selected=null;document.querySelector('#objName').value='';refresh()};
+document.querySelector('#addRover').onclick=()=>{const b=make('base','Rover chassis');b.position.set(0,.75,0);for(const x of [-1,1])for(const z of [-.72,.72]){const w=make('wheel','Drive wheel');w.rotation.z=Math.PI/2;w.position.set(x*1.05,.48,z)}const board=make('board','Controller board');board.position.set(0,1.1,0);const s=make('sensor','Distance sensor');s.position.set(0,1.35,.82);select(b)};
+document.querySelector('#reset').onclick=()=>{camera.position.set(7,6,9);controls.target.set(0,1,0);controls.update()};
+document.querySelector('#export').onclick=()=>{const data={app:'OcuNova 3D Model Studio',version:'0.2-preview',objects:objects.map(o=>({name:o.name,type:o.userData.kind,position:o.position.toArray(),rotation:o.rotation.toArray(),scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()}))};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ocunova-model-scene.json';a.click();URL.revokeObjectURL(a.href)};
+renderer.domElement.addEventListener('pointerdown',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-r.left)/r.width)*2-1;pointer.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(objects);if(hits.length)select(hits[0].object)});
+function resize(){const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(host);resize();
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();refresh();
+</script>
+</body></html>
