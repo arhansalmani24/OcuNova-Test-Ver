@@ -8,6 +8,9 @@ The original `index.html` experiment is preserved. Development prototypes are be
 
 ## Current entry points
 
+
+- `ocunova-visuals.html` — OcuNova light-theme visual landing page with a lightweight WebGL shader background, glass-style reveal interaction and responsive waterline-inspired navigation. This is a standalone browser-compatible adaptation of the visual ideas from the earlier React/21st.dev components; it is not a verbatim copy of those React source files.
+
 - `index.html` — original **NEON AURA AR** visual experiment with MediaPipe Hands tracking, Canvas effects, gesture feedback, themes and optional audio. Camera access depends on browser permissions and a compatible environment.
 - `workspace.html` — OcuNova interactive 3D workspace with orbit controls, object selection, primitive creation, editable transforms/materials and JSON scene export. Three.js is loaded from a CDN.
 - `model-studio.html` — 3D Model Studio with a component library, scene layers, sample rover assembly, editable object properties and JSON export. Three.js is loaded from a CDN.
@@ -20,7 +23,7 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 
 ## Revival roadmap
 
-1. Improve the shared app foundation, responsive navigation and accessibility.
+1. Improve the shared app foundation, responsive navigation and accessibility. The visual landing-page prototype is now available in `ocunova-visuals.html`.
 2. Connect the 3D workspace and model studio through a consistent project format.
 3. Expand the component and sensor reference library with grounded specifications.
 4. Build a more complete, validated simulation layer and guided lessons.
