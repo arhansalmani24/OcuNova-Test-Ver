@@ -14,7 +14,7 @@ The original `index.html` experiment is preserved. Development prototypes are be
 - `model-studio.html` — 3D Model Studio with a component library, scene layers, sample rover assembly, editable object properties and JSON export. Three.js is loaded from a CDN.
 - `circuit-forge.html` — visual circuit-layout prototype with Arduino-style components, draggable parts, port-to-port visual wires, sample prompt layouts and JSON export. Connections are not electrically validated; the prompt helper is not an AI service.
 - `physics-lab.html` — browser-based 2D teaching playground for free fall, ramp motion and bouncing, with adjustable gravity, mass, friction and restitution, live approximate measurements, a speed-history graph and CSV export.
-- `sensor-atlas.html` — offline-friendly reference catalogue for 12 common sensors. Search and category filters, sensor detail cards, common pin labels, wiring cautions, Arduino starter examples, library notes, manufacturer reference links for selected devices, and comparison of up to three sensors are implemented locally in the browser.
+- `sensor-atlas.html` — offline-friendly reference catalogue for 12 common sensors, linked from the landing-page navigation and feature cards. Search and category filters, sensor detail cards, common pin labels, wiring cautions, Arduino starter examples, library notes, manufacturer reference links for selected devices, and comparison of up to three sensors are implemented locally in the browser.
 
 ## Sensor Atlas scope and limitations
 
@@ -48,7 +48,7 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 
 - Source files and commits are present on the `ocunova-revival` branch.
 - The Physics Lab source was fetched back from GitHub and checked for its experiment controls, run/pause logic, CSV export and model-limitations note.
-- The Sensor Atlas was fetched back from GitHub; source-level checks confirmed its 12 catalogue entries, search control, comparison flow and clipboard-copy handler. JavaScript syntax parsing is being checked separately.
+- The Sensor Atlas and updated landing page were fetched back from GitHub. JavaScript syntax parsing passed for both inline scripts; the catalogue data check confirmed 12 unique entries with the required fields and starter examples.
 - These are source-level checks only. The Sensor Atlas has not been browser-tested or connected to physical sensors; starter sketches have not been compiled against hardware.
 - The Physics Lab has not yet been browser-tested across devices or independently validated against a physics reference.
 - The Three.js prototypes require a browser with WebGL and network access to their CDN dependencies.
