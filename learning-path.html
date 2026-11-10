@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f9ff">
+<title>OcuNova — Guided Learning Path</title>
+<style>
+:root{--ink:#152a43;--muted:#657b94;--blue:#2675df;--cyan:#27bdcf;--line:#e1eaf4;--bg:#f5f9ff;--panel:rgba(255,255,255,.88);--green:#14866b;--shadow:0 16px 44px rgba(35,79,125,.08)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 8% 0%,#e2f3ff 0,transparent 34%),radial-gradient(ellipse at 96% 15%,#e7f8ff 0,transparent 30%),var(--bg)}
+a{color:inherit}button,input{font:inherit}
+button{cursor:pointer}
+.skip{position:absolute;left:-9999px;top:8px;background:#fff;padding:10px;border-radius:8px;z-index:20}.skip:focus{left:8px}
+header{border-bottom:1px solid rgba(210,225,240,.8);background:#ffffffb8;backdrop-filter:blur(18px);position:sticky;top:0;z-index:5}
+.nav{max-width:1180px;margin:auto;min-height:68px;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:15px}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;font-weight:850;font-size:1.15rem;letter-spacing:-.04em}.mark{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:white;background:linear-gradient(135deg,#2476e4,#35c8d5);box-shadow:0 7px 18px #2877d52c}.brand span:last-child{color:var(--blue)}
+.navlinks{display:flex;align-items:center;gap:9px}.navlinks a{font-size:.87rem;color:#526b84;text-decoration:none;padding:9px 12px;border-radius:10px}.navlinks a:hover{background:#edf5ff;color:#1e68cb}
+main{max-width:1180px;margin:auto;padding:48px 22px 70px}
+.hero{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(260px,.8fr);gap:24px;align-items:center;margin-bottom:26px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border:1px solid #d9e9f8;background:#ffffffa8;border-radius:999px;color:#2873c7;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;font-weight:800}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px #27bdcf20}
+h1{font-size:clamp(2.4rem,5.5vw,4.7rem);letter-spacing:-.065em;line-height:1.02;margin:17px 0 13px}
+h1 span{background:linear-gradient(100deg,#1d6fd9,#2ab8ce);color:transparent;background-clip:text;-webkit-background-clip:text}
+.lead{max-width:670px;color:var(--muted);font-size:1.03rem;line-height:1.8;margin:0}
+.progress-card,.lesson,.notice{background:var(--panel);border:1px solid rgba(255,255,255,.95);box-shadow:var(--shadow);backdrop-filter:blur(14px);border-radius:22px}
+.progress-card{padding:21px}.progress-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:10px}.progress-top strong{font-size:.95rem}.percent{font:800 1.45rem "Space Grotesk",Inter,sans-serif;color:var(--blue)}
+.track{height:10px;border-radius:99px;background:#eaf1f8;overflow:hidden}.fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--cyan));border-radius:99px;transition:width .3s}
+.progress-meta{display:flex;justify-content:space-between;gap:10px;margin-top:10px;color:var(--muted);font-size:.78rem}
+.notice{padding:13px 16px;margin:0 0 24px;color:#5b7189;font-size:.83rem;line-height:1.6}.notice strong{color:#284c70}
+.section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin:34px 0 15px}.section-head h2{font-size:1.55rem;letter-spacing:-.04em;margin:0}.section-head p{margin:4px 0 0;color:var(--muted);font-size:.87rem}
+.reset{border:1px solid var(--line);background:#fff;color:#526a82;border-radius:11px;padding:9px 12px;font-size:.8rem;font-weight:700}.reset:hover{border-color:#9ec5ef;color:#1d68c8}
+.lessons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.lesson{overflow:hidden;min-width:0}
+.lesson summary{list-style:none;display:flex;align-items:center;gap:13px;padding:18px;cursor:pointer}.lesson summary::-webkit-details-marker{display:none}.lesson summary:focus-visible{outline:3px solid #83b7f1;outline-offset:-4px}
+.number{flex:0 0 42px;height:42px;border-radius:14px;display:grid;place-items:center;background:linear-gradient(135deg,#eaf3ff,#e6fbfc);color:#2471d2;font-weight:850}
+.lesson-heading{flex:1;min-width:0}.lesson-heading strong{display:block;font-size:1rem;letter-spacing:-.02em}.lesson-heading small{display:block;color:var(--muted);font-size:.76rem;margin-top:2px}
+.lesson-state{font-size:.7rem;font-weight:800;padding:6px 9px;border-radius:99px;background:#eef3f8;color:#72849a;white-space:nowrap}.lesson-state.done{background:#e8f8f2;color:var(--green)}
+.chevron{color:#8ca0b5;font-size:1.05rem;transition:transform .2s}.lesson[open] .chevron{transform:rotate(180deg)}
+.lesson-body{padding:0 18px 19px;border-top:1px solid #edf2f7}.lesson-intro{color:var(--muted);font-size:.86rem;line-height:1.7;margin:14px 0}
+.task-list{display:grid;gap:8px}.task{display:flex;align-items:flex-start;gap:11px;padding:11px 12px;border:1px solid #e8eef5;background:#fbfdff;border-radius:13px;cursor:pointer}.task:hover{border-color:#c4dcf6}.task input{width:17px;height:17px;flex:0 0 auto;margin:2px 0 0;accent-color:var(--blue)}.task span{min-width:0}.task strong{display:block;font-size:.82rem}.task small{display:block;color:var(--muted);font-size:.75rem;line-height:1.5;margin-top:2px}.task:has(input:checked){background:#f0faf7;border-color:#cdeee1}.task:has(input:checked) strong{text-decoration:line-through;text-decoration-color:#8bbca9;color:#54796d}
+.lesson-actions{display:flex;flex-wrap:wrap;gap:9px;margin:13px 0 17px}.tool-link{display:inline-flex;text-decoration:none;align-items:center;justify-content:center;padding:9px 12px;border-radius:10px;background:#edf5ff;color:#1e68cb;font-size:.78rem;font-weight:800}.tool-link:hover{background:#e0efff}.quiz{margin:0;padding:13px;border:1px solid #e2edf7;border-radius:14px;background:#f8fbff;min-width:0}.quiz legend{padding:0 5px;font-size:.75rem;font-weight:850;color:#45637f}.question{font-size:.83rem;font-weight:700;margin:2px 0 10px}.answers{display:grid;gap:7px}.answer{display:flex;align-items:flex-start;gap:8px;font-size:.78rem;color:#536b83;cursor:pointer}.answer input{accent-color:var(--blue);margin:3px 0 0}.feedback{min-height:20px;margin:9px 0 0;font-size:.75rem;color:#6a7e93}.feedback.correct{color:var(--green);font-weight:700}.feedback.incorrect{color:#a65b31}
+.footer-note{margin-top:20px;color:#71869c;font-size:.76rem;text-align:center}
+@media(max-width:850px){.hero{grid-template-columns:1fr}.progress-card{max-width:none}.navlinks a:not(:last-child){display:none}}
+@media(max-width:650px){.nav{padding:9px 13px}.navlinks a{display:block!important}main{padding:30px 13px 50px}.lessons{grid-template-columns:1fr}.section-head{align-items:flex-start;flex-direction:column}.lesson summary{padding:15px}.lesson-body{padding:0 14px 15px}.progress-meta{font-size:.72rem}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition-duration:.01ms!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to lessons</a>
+<header><nav class="nav" aria-label="Main navigation"><a class="brand" href="ocunova-visuals.html"><span class="mark">O</span><span>OcuNova</span></a><div class="navlinks"><a href="ocunova-visuals.html">Home</a><a href="#lessons">Learning path</a></div></nav></header>
+<main id="main">
+<section class="hero">
+  <div><div class="eyebrow"><i></i> Guided engineering learning</div><h1>Learn it.<br><span>Build it.</span></h1><p class="lead">A practical route through OcuNova's existing tools. Follow short missions, try each workspace, and check your understanding as you go.</p></div>
+  <section class="progress-card" aria-label="Your learning progress"><div class="progress-top"><strong>Learning progress</strong><span class="percent" id="percent">0%</span></div><div class="track" id="progressTrack" role="progressbar" aria-label="Lesson tasks completed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill" id="progressFill"></div></div><div class="progress-meta"><span id="taskCount">0 of 15 tasks complete</span><span id="quizCount">0 of 5 checks correct</span></div></section>
+</section>
+<div class="notice"><strong>Prototype note:</strong> Your checklist and quiz choices are saved only in this browser using local storage. Lessons are written guidance; there is no AI tutor, account sync, certificate, hardware connection or automatic grading service.</div>
+<div class="section-head" id="lessons"><div><h2>Your build-and-learn route</h2><p>Complete a mission, then use its tool link to practise.</p></div><button class="reset" id="resetProgress" type="button">Reset progress</button></div>
+<section class="lessons" id="lessonList" aria-label="Guided lessons"></section>
+<p class="footer-note" id="storageNote" role="status">Progress is stored on this device/browser only.</p>
+</main>
+<script>
+(function(){
+"use strict";
+var STORAGE_KEY="ocunova.learning-path.v1";
+var lessons=[
+{id:"workspace",title:"3D Workspace foundations",time:"5–8 min",tool:"workspace.html",toolLabel:"Open 3D Workspace",intro:"A 3D scene is made from objects, a camera and lights. Start with simple geometry and learn how changing the view differs from changing an object.",steps:[["Create a scene","Open the workspace and add a cube from the toolbar or quick library."],["Explore the camera","Drag inside the viewport to orbit, then scroll to zoom. These actions move the view, not the cube."],["Edit and export","Select the cube, change one position or scale value, then export the scene JSON."]],quiz:{question:"Which action changes the camera's distance from the scene?",options:["Changing the cube's colour","Scrolling to zoom","Editing the cube's X position"],answer:1,why:"Scroll zooms the camera. Editing X changes the selected object's position."}},
+{id:"model",title:"Assemble a 3D model",time:"6–10 min",tool:"model-studio.html",toolLabel:"Open Model Studio",intro:"Model Studio helps you combine simple parts into one concept. A component assembly is a visual arrangement; it is not yet a mechanically validated CAD model.",steps:[["Start with a chassis","Use Build sample rover, or add a rover base from the component library."],["Add visible components","Try wheels, a control board and a distance sensor. Select items from the scene or layer list."],["Inspect and export","Change a component's position or scale, then export the scene JSON for later reference."]],quiz:{question:"What does uniform scaling do to a selected object?",options:["Changes its size equally on all three axes","Changes only its colour","Checks whether the assembly can carry a load"],answer:0,why:"Uniform scaling changes X, Y and Z size together. It does not perform a strength or load analysis."}},
+{id:"circuit",title:"Understand a circuit layout",time:"6–9 min",tool:"circuit-forge.html",toolLabel:"Open Circuit Forge",intro:"Circuit Forge is a visual planning board. It lets you arrange parts and draw connection lines, but it does not calculate current, validate pin compatibility or simulate electricity.",steps:[["Place the parts","Add an Arduino-style board, a sensor and an output component to the board."],["Draw a visual connection","Choose Connect wires, then select two component ports to draw a line."],["Save your layout","Export the project JSON and read the limitation note before treating any diagram as a real wiring plan."]],quiz:{question:"A wire line appears between two ports. What has been confirmed?",options:["The circuit is electrically safe","The pins are compatible","Only a visual connection was drawn"],answer:2,why:"The prototype stores a visual connection only. It does not validate voltage, current, polarity or pin compatibility."}},
+{id:"sensors",title:"Research sensors responsibly",time:"5–8 min",tool:"sensor-atlas.html",toolLabel:"Open Sensor Atlas",intro:"A sensor converts a physical quantity into a signal. The exact board version matters: modules that look similar can have different pin labels or electrical requirements.",steps:[["Find a sensor","Search the Atlas for HC-SR04, DHT22 or another listed sensor and open its detail card."],["Compare two choices","Use the comparison feature to inspect what each sensor measures and its common pins."],["Check the documentation","Read the wiring cautions and manufacturer reference where available. Confirm the exact board datasheet before real hardware use."]],quiz:{question:"Why should you check the exact sensor-board datasheet?",options:["All boards use identical pinouts","Board variants can differ in pins and electrical limits","A datasheet automatically connects the sensor"],answer:1,why:"Board variants can differ. Confirm supply voltage, signal levels and pinout from the exact board documentation."}},
+{id:"physics",title:"Explore motion in Physics Lab",time:"5–8 min",tool:"physics-lab.html",toolLabel:"Open Physics Lab",intro:"The Physics Lab offers simplified learning experiments. Change one variable at a time and compare the trend; its outputs are not engineering design calculations.",steps:[["Choose an experiment","Open Free Fall, Ramp Motion or Bounce in Physics Lab."],["Change one setting","Adjust gravity, friction or bounciness, then run the experiment and observe the graph."],["Record what changed","Use the displayed readings or CSV export to compare two runs. Keep the model's limitations in mind."]],quiz:{question:"In the ideal free-fall model, what determines gravitational acceleration?",options:["The object's mass","The gravity setting","The object's colour"],answer:1,why:"In this simplified ideal model, gravitational acceleration comes from the gravity setting, not the object's mass."}}
+];
+var state={tasks:{},answers:{}};
+var list=document.getElementById("lessonList");
+var storageNote=document.getElementById("storageNote");
+function loadState(){
+ try{var raw=localStorage.getItem(STORAGE_KEY);if(raw){var parsed=JSON.parse(raw);if(parsed&&typeof parsed==="object"){state.tasks=parsed.tasks&&typeof parsed.tasks==="object"?parsed.tasks:{};state.answers=parsed.answers&&typeof parsed.answers==="object"?parsed.answers:{}}}}
+ catch(err){storageNote.textContent="Local storage is unavailable here; progress may not persist after this page closes."}
+}
+function saveState(){
+ try{localStorage.setItem(STORAGE_KEY,JSON.stringify(state));storageNote.textContent="Progress is stored on this device/browser only."}
+ catch(err){storageNote.textContent="This browser could not save progress. Your current checklist remains visible until the page closes."}
+}
+function isComplete(lesson){return lesson.steps.every(function(step,index){return state.tasks[lesson.id+":"+index]===true})}
+function renderLessons(){
+ list.innerHTML=lessons.map(function(lesson,index){
+  var done=isComplete(lesson),answer=state.answers[lesson.id];
+  var tasks=lesson.steps.map(function(step,stepIndex){var key=lesson.id+":"+stepIndex;return '<label class="task"><input type="checkbox" data-task="'+key+'" '+(state.tasks[key]===true?"checked":"")+'><span><strong>'+step[0]+'</strong><small>'+step[1]+'</small></span></label>'}).join("");
+  var options=lesson.quiz.options.map(function(option,optionIndex){return '<label class="answer"><input type="radio" name="quiz-'+lesson.id+'" data-quiz="'+lesson.id+'" value="'+optionIndex+'" '+(String(answer)===String(optionIndex)?"checked":"")+'><span>'+option+'</span></label>'}).join("");
+  var feedback="";
+  if(answer!==undefined&&answer!==null){var correct=Number(answer)===lesson.quiz.answer;feedback='<p class="feedback '+(correct?"correct":"incorrect")+'" data-feedback="'+lesson.id+'" role="status">'+(correct?"Correct. ":"Not quite. ")+lesson.quiz.why+'</p>'}
+  else{feedback='<p class="feedback" data-feedback="'+lesson.id+'" role="status">Choose an answer to check your understanding.</p>'}
+  return '<details class="lesson" data-lesson="'+lesson.id+'" '+(index===0?"open":"")+'><summary><span class="number">'+String(index+1).padStart(2,"0")+'</span><span class="lesson-heading"><strong>'+lesson.title+'</strong><small>'+lesson.time+' · '+lesson.steps.length+' tasks</small></span><span class="lesson-state '+(done?"done":"")+'" data-state="'+lesson.id+'">'+(done?"Completed":"In progress")+'</span><span class="chevron" aria-hidden="true">⌄</span></summary><div class="lesson-body"><p class="lesson-intro">'+lesson.intro+'</p><div class="task-list">'+tasks+'</div><div class="lesson-actions"><a class="tool-link" href="'+lesson.tool+'">'+lesson.toolLabel+' ↗</a></div><fieldset class="quiz"><legend>Quick knowledge check</legend><p class="question">'+lesson.quiz.question+'</p><div class="answers">'+options+'</div>'+feedback+'</fieldset></div></details>'
+ }).join("");
+ updateProgress();
+}
+function updateProgress(){
+ var total=0,done=0,correct=0,answered=0;
+ lessons.forEach(function(lesson){
+  lesson.steps.forEach(function(step,index){total++;if(state.tasks[lesson.id+":"+index]===true)done++});
+  if(state.answers[lesson.id]!==undefined&&state.answers[lesson.id]!==null){answered++;if(Number(state.answers[lesson.id])===lesson.quiz.answer)correct++}
+  var badge=document.querySelector('[data-state="'+lesson.id+'"]');if(badge){var complete=isComplete(lesson);badge.textContent=complete?"Completed":"In progress";badge.classList.toggle("done",complete)}
+ });
+ var percent=total?Math.round(done/total*100):0;
+ document.getElementById("percent").textContent=percent+"%";
+ document.getElementById("progressFill").style.width=percent+"%";
+ document.getElementById("progressTrack").setAttribute("aria-valuenow",String(percent));
+ document.getElementById("taskCount").textContent=done+" of "+total+" tasks complete";
+ document.getElementById("quizCount").textContent=correct+" of "+answered+" answered checks correct";
+}
+list.addEventListener("change",function(event){
+ var target=event.target;
+ if(target.matches("input[data-task]")){state.tasks[target.dataset.task]=target.checked;saveState();updateProgress()}
+ if(target.matches("input[data-quiz]")){
+  var id=target.dataset.quiz;state.answers[id]=Number(target.value);saveState();
+  var lesson=lessons.find(function(item){return item.id===id}),feedback=document.querySelector('[data-feedback="'+id+'"]');
+  var correct=Number(target.value)===lesson.quiz.answer;
+  feedback.className="feedback "+(correct?"correct":"incorrect");
+  feedback.textContent=(correct?"Correct. ":"Not quite. ")+lesson.quiz.why;
+  updateProgress();
+ }
+});
+document.getElementById("resetProgress").addEventListener("click",function(){
+ if(!window.confirm("Reset all lesson checklists and quiz answers saved in this browser?"))return;
+ state={tasks:{},answers:{}};
+ try{localStorage.removeItem(STORAGE_KEY)}catch(err){}
+ renderLessons();storageNote.textContent="Progress has been reset in this browser.";
+});
+loadState();renderLessons();
+})();
+</script>
+</body>
+</html>
