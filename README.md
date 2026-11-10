@@ -15,12 +15,17 @@ The original `index.html` experiment is preserved. Development prototypes are be
 - `circuit-forge.html` — visual circuit-layout prototype with Arduino-style components, draggable parts, port-to-port visual wires, sample prompt layouts and JSON export. Connections are not electrically validated; the prompt helper is not an AI service.
 - `physics-lab.html` — browser-based 2D teaching playground for free fall, ramp motion and bouncing, with adjustable gravity, mass, friction and restitution, live approximate measurements, a speed-history graph and CSV export.
 - `sensor-atlas.html` — offline-friendly reference catalogue for 12 common sensors, linked from the landing-page navigation and feature cards. Search and category filters, sensor detail cards, common pin labels, wiring cautions, Arduino starter examples, library notes, manufacturer reference links for selected devices, and comparison of up to three sensors are implemented locally in the browser.
+- `learning-path.html` — five guided engineering lessons covering the 3D Workspace, Model Studio, Circuit Forge, Sensor Atlas and Physics Lab. Includes 15 self-check tasks, five knowledge checks and browser-local progress.
 
 ## Sensor Atlas scope and limitations
 
 The Sensor Atlas is a static educational reference, not a hardware detector or live telemetry service. Its catalogue covers HC-SR04, HC-SR501 PIR, DHT11, DHT22/AM2302, BMP280, MPU-6050, DS18B20, LDR, capacitive soil-moisture modules, IR obstacle modules, BH1750 and SHT31. Search, category filtering, detail selection, copy-code controls and side-by-side comparison are client-side features; no account, AI service or backend is connected.
 
 Electrical values marked as typical are quick-reference guidance. Breakout boards can add regulators, level shifting, pull-ups or different pin layouts, so the exact board documentation takes priority. Analog readings from LDR and soil-moisture modules require calibration and are not universal lux or moisture percentages. Starter sketches require the named Arduino libraries where listed and have not been verified on physical hardware. This catalogue is a learning aid, not a substitute for datasheets or electrical review.
+
+## Guided Learning Path scope and limitations
+
+The Guided Learning Path contains five short lessons linked to the existing tools: 3D Workspace foundations, 3D model assembly, visual circuit layout, sensor research and simplified motion experiments. Each lesson has three self-check tasks and one knowledge check. Checklist state and selected answers are stored in the current browser with local storage; there is no account sync, server-side grading, certificate, AI tutor or remote progress database. The page is a learning guide and does not change or validate the underlying 3D, circuit, sensor or physics tools. Circuit Forge remains a visual layout only, and Physics Lab remains a simplified educational approximation.
 
 ## Physics Lab scope and limitations
 
@@ -31,7 +36,7 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 1. Improve the shared app foundation, responsive navigation and accessibility. The visual landing-page prototype is available in `ocunova-visuals.html`.
 2. Connect the 3D workspace and model studio through a consistent project format.
 3. Expand the sensor reference catalogue with additional documented parts and verified board variants; the first 12-sensor Sensor Atlas is now available.
-4. Build a more complete, validated simulation layer and guided lessons.
+4. Expand guided lessons and build a more complete, validated simulation layer.
 5. Add secure AI-assisted project generation only when a server-side integration is available.
 6. Add verified PDF/PPT project documentation exports.
 
@@ -48,8 +53,9 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 
 - Source files and commits are present on the `ocunova-revival` branch.
 - The Physics Lab source was fetched back from GitHub and checked for its experiment controls, run/pause logic, CSV export and model-limitations note.
+- The Guided Learning Path and updated landing page were fetched back from GitHub; their inline JavaScript passed V8 syntax parsing, five lesson modules and 15 tasks were confirmed, and the lesson tool destinations were checked against the repository entry points.
 - The Sensor Atlas and updated landing page were fetched back from GitHub. JavaScript syntax parsing passed for both inline scripts; the catalogue data check confirmed 12 unique entries with the required fields and starter examples.
-- These are source-level checks only. The Sensor Atlas has not been browser-tested or connected to physical sensors; starter sketches have not been compiled against hardware.
+- These are source-level checks only. The Guided Learning Path has not been browser-tested across devices; local-storage persistence and interactions still need manual browser testing. The Sensor Atlas has not been browser-tested or connected to physical sensors; starter sketches have not been compiled against hardware.
 - The Physics Lab has not yet been browser-tested across devices or independently validated against a physics reference.
 - The Three.js prototypes require a browser with WebGL and network access to their CDN dependencies.
 
