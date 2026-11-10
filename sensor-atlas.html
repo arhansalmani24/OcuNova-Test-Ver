@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6fbff">
+<meta name="description" content="OcuNova Sensor Atlas — an offline-friendly reference for common electronics sensors, interfaces, wiring and starter code.">
+<title>Sensor Atlas | OcuNova</title>
+<style>
+:root{color-scheme:light;--ink:#14243a;--muted:#65758b;--blue:#2866df;--cyan:#19b9d2;--pale:#edf7ff;--line:#dce8f4;--yellow:#ffd76a;--white:#fff;--shadow:0 18px 55px rgba(36,83,140,.10)}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(circle at 85% 0%,rgba(25,185,210,.10),transparent 28rem),linear-gradient(180deg,#f7fbff 0%,#f5f9ff 55%,#fff 100%);color:var(--ink);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+a{color:var(--blue)}
+.shell{width:min(1320px,calc(100% - 36px));margin:auto}
+.topbar{height:76px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(210,226,241,.8)}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--ink);font-weight:800;letter-spacing:-.04em;font-size:19px}
+.brandmark{width:36px;height:36px;border-radius:12px;background:linear-gradient(145deg,#2866df,#21c4d5);display:grid;place-items:center;color:#fff;box-shadow:0 8px 20px rgba(40,102,223,.22)}
+.brandmark svg{width:21px}
+.topmeta{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:13px}
+.local-pill{border:1px solid #cde8f1;background:#f0fcff;border-radius:99px;padding:7px 11px;color:#187d9b;font-weight:700}
+.hero{padding:56px 0 34px;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:36px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid #cce8f3;background:rgba(255,255,255,.78);border-radius:99px;padding:6px 11px;color:#187c9c;font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--cyan);box-shadow:0 0 0 4px #d9f7fb}
+h1{font-size:clamp(38px,5vw,64px);line-height:1.02;letter-spacing:-.065em;margin:18px 0 15px}
+h1 span{background:linear-gradient(90deg,#2866df,#18aebe);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{max-width:700px;color:var(--muted);font-size:17px;margin:0}
+.hero-card{border:1px solid #d8eaf5;background:linear-gradient(145deg,rgba(255,255,255,.96),rgba(235,249,255,.92));border-radius:24px;padding:22px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero-card:after{content:"";position:absolute;width:160px;height:160px;border-radius:50%;background:rgba(25,185,210,.12);right:-55px;top:-75px}
+.hero-card strong{font-size:31px;letter-spacing:-.06em;display:block}
+.hero-card small{color:var(--muted)}
+.metric-row{display:flex;gap:9px;margin-top:17px;flex-wrap:wrap}
+.metric{background:#fff;border:1px solid var(--line);padding:8px 10px;border-radius:12px;font-size:12px;color:#52667d}
+.metric b{color:var(--ink)}
+.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin:14px 0 18px;flex-wrap:wrap}
+.searchbox{position:relative;flex:1;min-width:230px;max-width:470px}
+.searchbox svg{position:absolute;left:14px;top:50%;transform:translateY(-50%);width:18px;color:#8295aa}
+.searchbox input{width:100%;height:46px;border:1px solid var(--line);background:#fff;border-radius:14px;padding:0 15px 0 43px;outline:none;box-shadow:0 4px 15px rgba(31,70,110,.035)}
+.searchbox input:focus{border-color:#75cbdc;box-shadow:0 0 0 4px rgba(25,185,210,.12)}
+.filters{display:flex;gap:7px;flex-wrap:wrap}
+.filter{border:1px solid var(--line);background:#fff;border-radius:99px;padding:9px 13px;color:#60748a;font-size:12px;font-weight:750;transition:.18s}
+.filter:hover,.filter.active{background:#eaf6ff;border-color:#b8dcf7;color:#245fc8}
+.main-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(350px,.95fr);gap:20px;align-items:start;padding-bottom:52px}
+.catalog-head{display:flex;align-items:center;justify-content:space-between;margin:4px 2px 12px}
+.catalog-head h2,.detail-head h2{font-size:18px;letter-spacing:-.035em;margin:0}
+.count{font-size:12px;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sensor-card{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:18px;padding:15px;transition:transform .18s,border-color .18s,box-shadow .18s;min-width:0}
+.sensor-card:hover{transform:translateY(-2px);border-color:#b8d8ed;box-shadow:0 12px 30px rgba(40,102,223,.08)}
+.sensor-card.selected{border-color:#65c9d9;box-shadow:0 0 0 3px rgba(25,185,210,.10)}
+.card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sensor-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:13px;background:linear-gradient(145deg,#e9f3ff,#e8fbfc);color:#2866df;font-size:18px;font-weight:850}
+.category{font-size:10px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#21849a;background:#edfbfd;border:1px solid #d2f0f4;padding:4px 7px;border-radius:99px}
+.sensor-card h3{font-size:15px;letter-spacing:-.025em;margin:12px 0 4px}
+.sensor-card p{color:var(--muted);font-size:12px;min-height:37px;margin:0 0 11px}
+.spec-line{display:flex;justify-content:space-between;gap:8px;border-top:1px solid #edf2f7;padding-top:9px;font-size:11px;color:var(--muted)}
+.spec-line b{color:#2a4059;text-align:right}
+.card-actions{display:flex;gap:7px;margin-top:12px}
+.card-actions button{border:1px solid var(--line);border-radius:10px;padding:7px 9px;background:#fff;color:#456079;font-size:11px;font-weight:750}
+.card-actions .view-btn{background:#edf5ff;border-color:#d7e8fb;color:#2866c8;flex:1}
+.card-actions button:hover{border-color:#9cc9e8}
+.detail{position:sticky;top:16px;background:rgba(255,255,255,.96);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);overflow:hidden}
+.detail-banner{padding:21px 22px 18px;background:linear-gradient(120deg,#eff7ff,#effdff);border-bottom:1px solid var(--line)}
+.detail-kicker{font-size:10px;text-transform:uppercase;letter-spacing:.11em;color:#2385a0;font-weight:850}
+.detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-top:6px}
+.detail-head h2{font-size:23px;line-height:1.12}
+.detail-sub{font-size:13px;color:var(--muted);margin:7px 0 0}
+.detail-body{padding:19px 22px 22px;max-height:calc(100vh - 245px);overflow:auto}
+.detail-section{margin-bottom:20px}
+.detail-section h3{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#60758c;margin:0 0 9px}
+.spec-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.spec{border:1px solid #e4edf5;border-radius:12px;padding:10px;background:#fbfdff}
+.spec small{display:block;color:#8090a2;font-size:10px;margin-bottom:3px}
+.spec b{font-size:12px;line-height:1.35;display:block}
+.pin-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.pin{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;background:#f6faff;border:1px solid #e3edf7;border-radius:10px;font-size:11px}
+.pin b{color:#2d5b91}
+.explain{font-size:13px;color:#52677d;margin:0}
+.note{background:#fff9e8;border:1px solid #f5e3a9;border-radius:12px;padding:11px 12px;color:#775d1e;font-size:12px}
+.codebox{background:#111e32;color:#e6f3ff;border-radius:14px;overflow:hidden}
+.code-top{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.10);font-size:11px;color:#a9c3db}
+.copy-btn{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.08);color:#fff;border-radius:8px;padding:5px 8px;font-size:10px}
+pre{margin:0;padding:13px;overflow:auto;font:11px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre}
+.source-links{display:flex;gap:8px;flex-wrap:wrap}
+.source-links a{font-size:11px;text-decoration:none;border:1px solid #d9e8f5;background:#f7fbff;border-radius:9px;padding:7px 9px}
+.empty{grid-column:1/-1;border:1px dashed #c8d8e7;border-radius:16px;padding:30px;text-align:center;color:var(--muted);background:rgba(255,255,255,.7)}
+.compare-bar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);display:none;align-items:center;gap:13px;background:#14243a;color:#fff;padding:11px 13px 11px 17px;border-radius:16px;box-shadow:0 16px 40px rgba(20,36,58,.24);z-index:10;max-width:calc(100% - 24px)}
+.compare-bar.show{display:flex}
+.compare-bar span{font-size:12px;color:#c4d7e8;white-space:nowrap}
+.compare-bar button{border:0;border-radius:10px;background:#d8f7fb;color:#145b75;padding:8px 12px;font-size:12px;font-weight:800}
+.compare-bar .clear-btn{background:transparent;color:#c4d7e8;padding:7px}
+.modal{position:fixed;inset:0;background:rgba(10,24,43,.48);display:none;align-items:center;justify-content:center;padding:18px;z-index:20}
+.modal.open{display:flex}
+.modal-card{width:min(850px,100%);max-height:85vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 30px 90px rgba(0,0,0,.25)}
+.modal-head{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:17px 20px;display:flex;align-items:center;justify-content:space-between;z-index:1}
+.modal-head h2{font-size:18px;margin:0}
+.close-btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:6px 10px}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px}
+.compare-table th,.compare-table td{padding:12px 14px;text-align:left;border-bottom:1px solid #edf2f7;vertical-align:top;min-width:130px}
+.compare-table th:first-child,.compare-table td:first-child{font-weight:800;color:#5e7187;min-width:110px;background:#f8fbfe}
+.compare-table thead th{color:#1d3854;font-size:13px;background:#f1f8ff}
+.footer{border-top:1px solid var(--line);padding:22px 0 35px;color:#7b8b9d;font-size:11px;display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.footer b{color:#52677d}
+@media(max-width:950px){.hero{grid-template-columns:1fr 240px}.main-grid{grid-template-columns:1fr}.detail{position:relative;top:auto}.detail-body{max-height:none}}
+@media(max-width:620px){.shell{width:min(100% - 24px,1320px)}.topbar{height:64px}.topmeta{font-size:11px}.hero{padding:38px 0 22px;grid-template-columns:1fr;gap:20px}.hero-card{max-width:100%}.hero p{font-size:15px}.toolbar{align-items:stretch}.searchbox{max-width:none}.filters{overflow-x:auto;flex-wrap:nowrap;padding-bottom:5px}.filter{white-space:nowrap}.cards{grid-template-columns:1fr}.sensor-card p{min-height:0}.detail-body{padding:16px}.detail-banner{padding:18px 16px}.compare-bar{width:calc(100% - 24px);justify-content:space-between}.compare-bar span{white-space:normal}.footer{display:block}.footer span{display:block;margin-top:6px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <a class="brand" href="ocunova-visuals.html" aria-label="OcuNova home">
+    <span class="brandmark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M3 12s3.2-6 9-6 9 6 9 6-3.2 6-9 6-9-6-9-6Z" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="2.8" fill="currentColor"/></svg></span>
+    OcuNova
+  </a>
+  <div class="topmeta"><span>Engineering learning workspace</span><span class="local-pill">Offline-friendly reference</span></div>
+</header>
+<section class="hero">
+  <div>
+    <span class="eyebrow"><i></i> Component knowledge base</span>
+    <h1>Meet your <span>sensors.</span></h1>
+    <p>Explore what each module measures, how it communicates, what its pins do and where to start with Arduino. Search, filter and compare without an account.</p>
+  </div>
+  <aside class="hero-card" aria-label="Sensor Atlas summary">
+    <small>OcuNova / Hardware reference</small>
+    <strong>12 sensors</strong>
+    <small>Curated starter catalogue</small>
+    <div class="metric-row"><span class="metric"><b>5</b> categories</span><span class="metric"><b>12</b> examples</span><span class="metric"><b>0</b> sign-ins</span></div>
+  </aside>
+</section>
+<section class="toolbar" aria-label="Sensor search and filters">
+  <label class="searchbox">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+    <input id="search" type="search" placeholder="Search sensors, measurements or interfaces…" autocomplete="off" aria-label="Search sensors">
+  </label>
+  <div class="filters" id="filters" aria-label="Filter by category"></div>
+</section>
+<main class="main-grid">
+  <section aria-labelledby="catalogTitle">
+    <div class="catalog-head"><h2 id="catalogTitle">Sensor catalogue</h2><span class="count" id="resultCount" aria-live="polite"></span></div>
+    <div class="cards" id="cards"></div>
+  </section>
+  <aside class="detail" id="detail" aria-live="polite" aria-label="Selected sensor details"></aside>
+</main>
+<footer class="footer">
+  <div><b>OcuNova Sensor Atlas</b> · A student learning reference, not a substitute for the exact board datasheet.</div>
+  <span>Check voltage, pin labels and logic levels on your own module before wiring.</span>
+</footer>
+</div>
+<div class="compare-bar" id="compareBar"><span id="compareCount">0 selected</span><button id="compareOpen" type="button">Compare sensors</button><button class="clear-btn" id="compareClear" type="button" aria-label="Clear comparison">Clear</button></div>
+<div class="modal" id="compareModal" role="dialog" aria-modal="true" aria-labelledby="compareTitle">
+  <div class="modal-card"><div class="modal-head"><h2 id="compareTitle">Sensor comparison</h2><button class="close-btn" id="compareClose" type="button">Close</button></div><div id="compareContent"></div></div>
+</div>
+<script>
+const sensors = [
+{id:"hcsr04",name:"HC-SR04",title:"Ultrasonic distance module",category:"Distance",icon:"↔",summary:"Measures distance by timing the echo of an ultrasonic pulse.",measures:"Distance / proximity",supply:"5 V module (typical)",interface:"TRIG + ECHO digital pulses",range:"About 2–400 cm (module-dependent)",output:"Echo pulse width",pins:[["VCC","5 V supply"],["TRIG","Trigger input"],["ECHO","Timed output pulse"],["GND","Ground"]],how:"The board sends a short 40 kHz sound burst. It measures how long the reflected sound takes to return; distance is estimated from the round-trip travel time.",note:"The ECHO pin on common 5 V boards can output 5 V. Use a suitable level shifter or divider before connecting it to a 3.3 V-only GPIO such as many ESP32 boards. Soft, angled or very small objects can give unreliable readings.",code:"const int trigPin = 9;\nconst int echoPin = 10;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(trigPin, OUTPUT);\n  pinMode(echoPin, INPUT);\n}\n\nvoid loop() {\n  digitalWrite(trigPin, LOW);\n  delayMicroseconds(2);\n  digitalWrite(trigPin, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(trigPin, LOW);\n\n  unsigned long us = pulseIn(echoPin, HIGH, 30000);\n  if (us > 0) {\n    float cm = us * 0.0343 / 2.0;\n    Serial.println(cm);\n  } else {\n    Serial.println(\"No echo\");\n  }\n  delay(100);\n}",libraries:"No extra library required",tags:"ultrasonic sonar robot obstacle parking water level",docs:[["Module overview","https://www.sparkfun.com/products/15569"]]},
+{id:"pir",name:"PIR HC-SR501",title:"Passive infrared motion module",category:"Motion",icon:"⌁",summary:"Detects changes in infrared energy from moving warm objects.",measures:"Motion across its field of view",supply:"About 4.5–20 V module input",interface:"Digital HIGH / LOW",range:"Often a few metres; adjustable",output:"Digital motion state",pins:[["VCC","Module supply"],["OUT","Digital output"],["GND","Ground"]],how:"A pyroelectric element responds to changes in infrared energy. The lens divides the view into zones, so movement across zones changes the signal.",note:"It detects changing infrared patterns, not a person's identity or exact distance. Warm rooms, sunlight, airflow and module adjustment can affect behaviour. Confirm the exact board's supply and output specifications.",code:"const int pirPin = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(pirPin, INPUT);\n}\n\nvoid loop() {\n  if (digitalRead(pirPin) == HIGH) {\n    Serial.println(\"Motion detected\");\n  } else {\n    Serial.println(\"No motion\");\n  }\n  delay(200);\n}",libraries:"No extra library required",tags:"motion movement infrared occupancy",docs:[]},
+{id:"dht11",name:"DHT11",title:"Basic temperature + humidity sensor",category:"Environment",icon:"°",summary:"A low-cost digital module for basic room-condition experiments.",measures:"Air temperature and relative humidity",supply:"About 3–5.5 V",interface:"Single-wire digital data",range:"0–50 °C · 20–90% RH (typical)",output:"Digital readings",pins:[["VCC","Supply"],["DATA","Digital data"],["NC","Not connected (if present)"],["GND","Ground"]],how:"A humidity-sensitive element and temperature sensor are read by a small controller inside the package, which sends a digital data frame to the microcontroller.",note:"DHT11 has limited range and resolution and is relatively slow. Many breakout boards include a pull-up resistor; a bare sensor may need one. The code below uses the Adafruit DHT library.",code:"#include <DHT.h>\n\n#define DHTPIN 2\n#define DHTTYPE DHT11\nDHT dht(DHTPIN, DHTTYPE);\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  if (isnan(t) || isnan(h)) {\n    Serial.println(\"Read failed\");\n  } else {\n    Serial.print(t); Serial.print(\" C, \");\n    Serial.print(h); Serial.println(\" %RH\");\n  }\n  delay(2000);\n}",libraries:"Adafruit DHT sensor library",tags:"temperature humidity weather climate room",docs:[]},
+{id:"dht22",name:"DHT22 / AM2302",title:"Wider-range temperature + humidity sensor",category:"Environment",icon:"°",summary:"A digital environment sensor with a wider range than DHT11.",measures:"Air temperature and relative humidity",supply:"About 3.3–5.5 V",interface:"Single-wire digital data",range:"−40–80 °C · up to 100% RH (datasheet range)",output:"Digital readings",pins:[["VCC","Supply"],["DATA","Digital data"],["NC","Not connected (if present)"],["GND","Ground"]],how:"The integrated sensor measures temperature and humidity, then transmits a digital data frame with a checksum over its single data line.",note:"Allow at least about 2 seconds between measurements. Breakout pin order varies, so read the board labels. The example uses the Adafruit DHT library.",code:"#include <DHT.h>\n\n#define DHTPIN 2\n#define DHTTYPE DHT22\nDHT dht(DHTPIN, DHTTYPE);\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  float t = dht.readTemperature();\n  float h = dht.readHumidity();\n  if (isnan(t) || isnan(h)) {\n    Serial.println(\"Read failed\");\n  } else {\n    Serial.print(t); Serial.print(\" C, \");\n    Serial.print(h); Serial.println(\" %RH\");\n  }\n  delay(2000);\n}",libraries:"Adafruit DHT sensor library",tags:"temperature humidity weather climate room AM2302",docs:[["Aosong AM2302 reference","https://www.aosong.com/en/products-22.html"]]},
+{id:"bmp280",name:"BMP280",title:"Barometric pressure sensor",category:"Environment",icon:"P",summary:"Measures air pressure and temperature; useful for altitude-trend experiments.",measures:"Pressure and temperature",supply:"Chip: 1.71–3.6 V",interface:"I²C or SPI",range:"300–1100 hPa pressure",output:"Digital measurements",pins:[["VCC / VIN","Use the breakout's rated supply"],["GND","Ground"],["SDA","I²C data"],["SCL","I²C clock"],["CSB / SDO","SPI / I²C address options (board-dependent)"]],how:"A tiny MEMS pressure element changes electrically as air pressure changes. On-chip conversion and calibration coefficients help the controller calculate pressure and temperature.",note:"The bare BMP280 chip is not a 5 V part. Some breakout boards add a regulator and level shifting; others do not. Check your exact breakout before wiring. Pressure-derived altitude is an estimate and changes with weather.",code:"#include <Wire.h>\n#include <Adafruit_BMP280.h>\n\nAdafruit_BMP280 bmp;\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!bmp.begin(0x76)) {\n    Serial.println(\"BMP280 not found\");\n    while (1) delay(10);\n  }\n}\n\nvoid loop() {\n  Serial.print(\"Temp C: \");\n  Serial.println(bmp.readTemperature());\n  Serial.print(\"Pressure hPa: \");\n  Serial.println(bmp.readPressure() / 100.0);\n  delay(1000);\n}",libraries:"Adafruit BMP280 Library + Adafruit Unified Sensor",tags:"pressure barometer altitude weather temperature i2c",docs:[["Bosch BMP280 datasheet","https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf"]]},
+{id:"mpu6050",name:"MPU-6050",title:"6-axis motion sensor (IMU)",category:"Motion",icon:"⌖",summary:"Combines a 3-axis accelerometer and a 3-axis gyroscope.",measures:"Acceleration and angular velocity",supply:"Chip: about 2.375–3.46 V",interface:"I²C",range:"Accel ±2/4/8/16 g · gyro ±250/500/1000/2000 °/s",output:"Digital motion data",pins:[["VCC","Check breakout rating"],["GND","Ground"],["SDA","I²C data"],["SCL","I²C clock"],["INT","Optional interrupt output"]],how:"The accelerometer senses acceleration along three axes. The gyroscope senses rotation rate along three axes. Software can combine these signals to estimate orientation, with calibration and drift considerations.",note:"The chip itself uses low-voltage power and logic. Some breakout boards add a regulator; not all add logic-level shifting. Accelerometer data includes gravity, and gyro integration drifts over time.",code:"#include <Wire.h>\n#include <Adafruit_MPU6050.h>\n#include <Adafruit_Sensor.h>\n\nAdafruit_MPU6050 mpu;\n\nvoid setup() {\n  Serial.begin(115200);\n  if (!mpu.begin()) {\n    Serial.println(\"MPU6050 not found\");\n    while (1) delay(10);\n  }\n}\n\nvoid loop() {\n  sensors_event_t a, g, temp;\n  mpu.getEvent(&a, &g, &temp);\n  Serial.print(\"Accel X: \");\n  Serial.print(a.acceleration.x);\n  Serial.print(\" m/s^2 | Gyro Z: \");\n  Serial.println(g.gyro.z);\n  delay(100);\n}",libraries:"Adafruit MPU6050 + Adafruit Unified Sensor",tags:"imu accelerometer gyroscope tilt rotation balance robot",docs:[["TDK InvenSense MPU-6050 datasheet","https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf"]]},
+{id:"ds18b20",name:"DS18B20",title:"1-Wire digital temperature sensor",category:"Environment",icon:"°",summary:"A digital temperature sensor that supports multiple devices on one data bus.",measures:"Temperature",supply:"3.0–5.5 V",interface:"1-Wire digital bus",range:"−55–125 °C · ±0.5 °C from −10–85 °C",output:"Digital temperature value",pins:[["VDD","Supply (or parasite-power option)"],["DQ","1-Wire data"],["GND","Ground"]],how:"The sensor converts temperature internally and returns a digital value over the 1-Wire bus. Each device has a unique 64-bit address, so several can share a bus.",note:"A pull-up resistor is normally required on DQ (often 4.7 kΩ for short hobby wiring). TO-92 pin order must be checked against the package datasheet; waterproof probes and breakout boards can use different wire colours.",code:"#include <OneWire.h>\n#include <DallasTemperature.h>\n\nOneWire oneWire(2);\nDallasTemperature sensors(&oneWire);\n\nvoid setup() {\n  Serial.begin(9600);\n  sensors.begin();\n}\n\nvoid loop() {\n  sensors.requestTemperatures();\n  Serial.print(\"Temperature C: \");\n  Serial.println(sensors.getTempCByIndex(0));\n  delay(1000);\n}",libraries:"OneWire + DallasTemperature",tags:"temperature probe waterproof 1-wire thermal",docs:[["Analog Devices DS18B20 datasheet","https://www.analog.com/media/en/technical-documentation/data-sheets/ds18b20.pdf"]]},
+{id:"ldr",name:"LDR / photoresistor",title:"Light-sensitive resistor",category:"Light",icon:"☼",summary:"Its resistance changes with the amount of light falling on it.",measures:"Relative light level",supply:"No fixed supply; use a divider",interface:"Analog voltage via resistor divider",range:"Depends on LDR and divider resistor",output:"Analog input value",pins:[["LDR leg 1","Connect to supply side of divider"],["LDR leg 2","Join divider node"],["Fixed resistor","From divider node to GND (example)"],["Analog pin","Read divider node"]],how:"The photoresistor's resistance generally decreases as light increases. A fixed resistor turns that resistance change into a voltage the microcontroller's ADC can read.",note:"An LDR is not a calibrated lux meter. The ADC value depends on the LDR, fixed resistor, board voltage and ADC reference. Use a resistor divider and calibrate thresholds for your own setup.",code:"const int ldrPin = A0;\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int reading = analogRead(ldrPin);\n  Serial.print(\"Light divider reading: \");\n  Serial.println(reading);\n  delay(250);\n}",libraries:"No extra library required",tags:"light brightness photoresistor analog day night",docs:[]},
+{id:"soil",name:"Capacitive soil moisture",title:"Soil moisture sensing module",category:"Environment",icon:"≈",summary:"Estimates soil moisture from a change in capacitance.",measures:"Relative soil moisture",supply:"Often 3.3–5 V; check board",interface:"Analog voltage",range:"Board- and soil-dependent",output:"Analog input value",pins:[["VCC","Module-rated supply"],["GND","Ground"],["AOUT","Analog output"]],how:"The sensing area forms part of a capacitor. Moisture changes the effective dielectric around it, changing the output signal.",note:"Treat the reading as a relative value, not a universal percentage. Calibrate in the actual soil using known dry and wet reference conditions. Keep the electronics section above the soil and follow the module's water-resistance limits.",code:"const int soilPin = A0;\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int raw = analogRead(soilPin);\n  Serial.print(\"Raw moisture reading: \");\n  Serial.println(raw);\n  delay(500);\n}",libraries:"No extra library required",tags:"soil moisture agriculture plant irrigation analog capacitive",docs:[]},
+{id:"ir",name:"IR obstacle module",title:"Reflective infrared detector",category:"Distance",icon:"◉",summary:"Uses reflected infrared light to detect a nearby surface or object.",measures:"Near-field obstacle presence",supply:"Often 3.3–5 V module input",interface:"Usually digital comparator output",range:"Short range; board and surface dependent",output:"Digital HIGH / LOW (often adjustable)",pins:[["VCC","Module-rated supply"],["GND","Ground"],["OUT","Digital comparator output"],["AO","Only if fitted: analog signal"]],how:"An IR LED sends infrared light and a photodetector senses reflected light. A comparator on many modules turns the signal into a threshold-based digital output.",note:"It is not a precise distance sensor. Dark, shiny, transparent or angled surfaces can behave differently. The onboard potentiometer usually changes the detection threshold, not a calibrated distance.",code:"const int irPin = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(irPin, INPUT);\n}\n\nvoid loop() {\n  int state = digitalRead(irPin);\n  Serial.println(state == LOW ? \"Output LOW\" : \"Output HIGH\");\n  delay(150);\n}",libraries:"No extra library required",tags:"infrared obstacle reflective robot proximity",docs:[]},
+{id:"bh1750",name:"BH1750",title:"Digital ambient light sensor",category:"Light",icon:"☼",summary:"Measures ambient illuminance and reports a digital lux value.",measures:"Illuminance (lux)",supply:"Chip: about 2.4–3.6 V",interface:"I²C",range:"Up to about 65,535 lx (mode-dependent)",output:"Digital lux reading",pins:[["VCC","Check breakout rating"],["GND","Ground"],["SDA","I²C data"],["SCL","I²C clock"],["ADDR","Optional I²C address select"]],how:"A photodiode and internal converter measure incident light and send a digital value over I²C. The library converts the raw measurement to an approximate lux reading.",note:"The sensor chip is not a 5 V part. Some breakouts include regulation and level shifting; others do not. Avoid covering the sensor and allow it to settle after changing measurement modes.",code:"#include <Wire.h>\n#include <BH1750.h>\n\nBH1750 lightMeter;\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  lightMeter.begin();\n}\n\nvoid loop() {\n  float lux = lightMeter.readLightLevel();\n  Serial.print(\"Light: \");\n  Serial.print(lux);\n  Serial.println(\" lx\");\n  delay(500);\n}",libraries:"BH1750 library",tags:"light lux brightness illuminance i2c",docs:[["ROHM BH1750FVI datasheet","https://fscdn.rohm.com/en/products/databook/datasheet/ic/sensor/light/bh1750fvi-e.pdf"]]},
+{id:"sht31",name:"SHT31",title:"Digital temperature + humidity sensor",category:"Environment",icon:"°",summary:"A higher-performance digital sensor for temperature and relative humidity.",measures:"Air temperature and relative humidity",supply:"Chip: about 2.15–5.5 V",interface:"I²C",range:"−40–125 °C · 0–100% RH (sensor range)",output:"Digital readings",pins:[["VCC","Check breakout rating"],["GND","Ground"],["SDA","I²C data"],["SCL","I²C clock"],["ALERT","Optional interrupt output"]],how:"A capacitive humidity element and temperature sensor are integrated with signal conditioning and digital conversion. Readings are transmitted over I²C.",note:"The bare sensor and breakout board may have different voltage requirements. Avoid condensation on the sensor and follow the manufacturer guidance for long-term exposure to high humidity.",code:"#include <Wire.h>\n#include <Adafruit_SHT31.h>\n\nAdafruit_SHT31 sht31 = Adafruit_SHT31();\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!sht31.begin(0x44)) {\n    Serial.println(\"SHT31 not found\");\n    while (1) delay(10);\n  }\n}\n\nvoid loop() {\n  Serial.print(\"Temp C: \");\n  Serial.println(sht31.readTemperature());\n  Serial.print(\"Humidity %: \");\n  Serial.println(sht31.readHumidity());\n  delay(1000);\n}",libraries:"Adafruit SHT31 Library",tags:"temperature humidity environment weather i2c",docs:[["Sensirion SHT3x datasheet","https://sensirion.com/media/documents/213E6A3B/63A5A569/Datasheet_SHT3x_DIS.pdf"]]}
+];
+const categories = ["All","Distance","Motion","Environment","Light"];
+let activeCategory = "All";
+let selectedId = sensors[0].id;
+let compareSet = new Set();
+const $ = (id) => document.getElementById(id);
+const esc = (value) => String(value).replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function visibleSensors() {
+  const q = $("search").value.trim().toLowerCase();
+  return sensors.filter((s) => {
+    const matchesCategory = activeCategory === "All" || s.category === activeCategory;
+    const haystack = [s.name,s.title,s.summary,s.measures,s.interface,s.tags].join(" ").toLowerCase();
+    return matchesCategory && (!q || haystack.includes(q));
+  });
+}
+function renderFilters() {
+  $("filters").innerHTML = categories.map((c) => '<button class="filter '+(activeCategory===c?'active':'')+'" type="button" data-category="'+esc(c)+'" aria-pressed="'+(activeCategory===c)+'">'+esc(c)+'</button>').join("");
+}
+function renderCards() {
+  const list = visibleSensors();
+  $("resultCount").textContent = list.length + " of " + sensors.length + " shown";
+  if (!list.some((s) => s.id === selectedId) && list.length) selectedId = list[0].id;
+  if (!list.length) {
+    $("cards").innerHTML = '<div class="empty">No sensors match that search. Try another keyword or category.</div>';
+    $("detail").innerHTML = '<div class="detail-banner"><div class="detail-kicker">No result selected</div><div class="detail-head"><h2>Try another search</h2></div><p class="detail-sub">The full catalogue is stored locally in this page.</p></div>';
+    return;
+  }
+  $("cards").innerHTML = list.map((s) => '<article class="sensor-card '+(s.id===selectedId?'selected':'')+'"><div class="card-top"><span class="sensor-icon" aria-hidden="true">'+esc(s.icon)+'</span><span class="category">'+esc(s.category)+'</span></div><h3>'+esc(s.name)+'</h3><p>'+esc(s.summary)+'</p><div class="spec-line"><span>Measures</span><b>'+esc(s.measures)+'</b></div><div class="spec-line"><span>Interface</span><b>'+esc(s.interface)+'</b></div><div class="card-actions"><button class="view-btn" type="button" data-view="'+s.id+'">Explore details</button><button type="button" data-compare="'+s.id+'" aria-pressed="'+compareSet.has(s.id)+'">'+(compareSet.has(s.id)?"✓ Added":"＋ Compare")+'</button></div></article>').join("");
+  renderDetail();
+}
+function renderDetail() {
+  const s = sensors.find((item) => item.id === selectedId);
+  if (!s) return;
+  $("detail").innerHTML = '<div class="detail-banner"><div class="detail-kicker">'+esc(s.category)+' / Sensor profile</div><div class="detail-head"><h2>'+esc(s.name)+'</h2><span class="category">Atlas</span></div><p class="detail-sub">'+esc(s.title)+' · '+esc(s.summary)+'</p></div><div class="detail-body"><section class="detail-section"><h3>At a glance</h3><div class="spec-grid"><div class="spec"><small>What it measures</small><b>'+esc(s.measures)+'</b></div><div class="spec"><small>Supply (check board)</small><b>'+esc(s.supply)+'</b></div><div class="spec"><small>Communication</small><b>'+esc(s.interface)+'</b></div><div class="spec"><small>Typical range</small><b>'+esc(s.range)+'</b></div><div class="spec"><small>Output</small><b>'+esc(s.output)+'</b></div><div class="spec"><small>Libraries</small><b>'+esc(s.libraries)+'</b></div></div></section><section class="detail-section"><h3>Common pin labels</h3><div class="pin-list">'+s.pins.map((p)=>'<div class="pin"><b>'+esc(p[0])+'</b><span>'+esc(p[1])+'</span></div>').join("")+'</div></section><section class="detail-section"><h3>How it works</h3><p class="explain">'+esc(s.how)+'</p></section><section class="detail-section"><div class="note"><b>Wiring note:</b> '+esc(s.note)+'</div></section><section class="detail-section"><h3>Arduino starter example</h3><div class="codebox"><div class="code-top"><span>Arduino / C++ · '+esc(s.libraries)+'</span><button class="copy-btn" id="copyCode" type="button">Copy code</button></div><pre><code id="codeText">'+esc(s.code)+'</code></pre></div></section><section class="detail-section"><h3>Reference links</h3><div class="source-links">'+(s.docs.length?s.docs.map((d)=>'<a href="'+esc(d[1])+'" target="_blank" rel="noopener noreferrer">'+esc(d[0])+' ↗</a>').join(""):'<span class="explain">No manufacturer document linked here yet. Use the exact module marking to locate its datasheet.</span>')+'</div></section></div>';
+  $("copyCode").addEventListener("click", async () => {
+    const btn = $("copyCode");
+    try { await navigator.clipboard.writeText(s.code); btn.textContent = "Copied"; }
+    catch (e) { btn.textContent = "Select code to copy"; }
+    setTimeout(() => { if ($("copyCode")) $("copyCode").textContent = "Copy code"; }, 1600);
+  });
+}
+function renderCompareBar() {
+  const count = compareSet.size;
+  $("compareBar").classList.toggle("show",count>0);
+  $("compareCount").textContent = count + " sensor" + (count===1?"":"s") + " selected";
+  $("compareOpen").disabled = count < 2;
+  $("compareOpen").style.opacity = count < 2 ? ".55" : "1";
+}
+function renderCompare() {
+  const chosen = sensors.filter((s)=>compareSet.has(s.id));
+  const rows = [["Measures","measures"],["Supply","supply"],["Interface","interface"],["Typical range","range"],["Output","output"],["Libraries","libraries"]];
+  $("compareContent").innerHTML = '<table class="compare-table"><thead><tr><th>Specification</th>'+chosen.map((s)=>'<th>'+esc(s.name)+'</th>').join("")+'</tr></thead><tbody>'+rows.map((r)=>'<tr><td>'+r[0]+'</td>'+chosen.map((s)=>'<td>'+esc(s[r[1]])+'</td>').join("")+'</tr>').join("")+'</tbody></table><p style="padding:0 18px 16px;color:#718197;font-size:11px">Values are quick-reference summaries. Confirm electrical limits and pinout against the exact board datasheet.</p>';
+}
+$("filters").addEventListener("click",(e)=>{const b=e.target.closest("[data-category]");if(!b)return;activeCategory=b.dataset.category;renderFilters();renderCards();});
+$("cards").addEventListener("click",(e)=>{
+  const view=e.target.closest("[data-view]");
+  const cmp=e.target.closest("[data-compare]");
+  if(view){selectedId=view.dataset.view;renderCards();return;}
+  if(cmp){const id=cmp.dataset.compare;if(compareSet.has(id))compareSet.delete(id);else if(compareSet.size<3)compareSet.add(id);else {cmp.textContent="Max 3";setTimeout(renderCards,900);return;}renderCards();renderCompareBar();}
+});
+$("search").addEventListener("input",renderCards);
+$("compareOpen").addEventListener("click",()=>{if(compareSet.size<2)return;renderCompare();$("compareModal").classList.add("open");$("compareClose").focus();});
+$("compareClose").addEventListener("click",()=>$("compareModal").classList.remove("open"));
+$("compareModal").addEventListener("click",(e)=>{if(e.target===$("compareModal"))$("compareModal").classList.remove("open");});
+$("compareClear").addEventListener("click",()=>{compareSet.clear();renderCards();renderCompareBar();});
+document.addEventListener("keydown",(e)=>{if(e.key==="Escape")$("compareModal").classList.remove("open");});
+renderFilters();renderCards();renderCompareBar();
+</script>
+</body>
+</html>
