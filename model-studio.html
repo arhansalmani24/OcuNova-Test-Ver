@@ -22,7 +22,7 @@ main{display:grid;grid-template-columns:220px minmax(300px,1fr) 250px;gap:14px;p
 </style>
 </head>
 <body>
-<header><div><div class="brand">Ocu<span>Nova</span></div><div class="sub">3D MODEL STUDIO · BUILD / EXPLORE / LEARN</div></div><div class="actions"><button id="reset">Reset view</button><button id="export" class="primary">Export scene</button></div></header>
+<header><div><div class="brand">Ocu<span>Nova</span></div><div class="sub">3D MODEL STUDIO · BUILD / EXPLORE / LEARN</div></div><div class="actions"><button id="reset">Reset view</button><button id="importProject">Import JSON</button><button id="export" class="primary">Export project</button><input id="projectFile" type="file" accept=".json,application/json" hidden aria-label="Choose an OcuNova project JSON file"></div></header>
 <main>
 <aside class="panel left"><h3>Component library</h3><div class="library">
 <div class="part" data-kind="box"><span class="emoji">▰</span><small>Block</small></div><div class="part" data-kind="sphere"><span class="emoji">●</span><small>Sphere</small></div>
@@ -47,6 +47,7 @@ main{display:grid;grid-template-columns:220px minmax(300px,1fr) 250px;gap:14px;p
 <script type="module">
 import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 import {OrbitControls} from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+import { createOcuNovaProject, downloadOcuNovaProject, normalizeOcuNovaProject } from './project-format.js';
 const host=document.querySelector('#viewport'),scene=new THREE.Scene();scene.background=new THREE.Color('#edf7ff');
 const camera=new THREE.PerspectiveCamera(45,1,.1,100);camera.position.set(7,6,9);
 const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.outputColorSpace=THREE.SRGBColorSpace;host.appendChild(renderer.domElement);
@@ -55,18 +56,50 @@ scene.add(new THREE.HemisphereLight(0xffffff,0x9bbbd1,2));const key=new THREE.Di
 const grid=new THREE.GridHelper(18,36,0x9fc5df,0xd5e6f2);scene.add(grid);const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0xf4faff,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.025;ground.receiveShadow=true;scene.add(ground);
 let objects=[],selected=null;const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
 function material(color){return new THREE.MeshStandardMaterial({color,metalness:.22,roughness:.38})}
-function make(kind,name){let geo;let color='#2588e8';if(kind==='sphere')geo=new THREE.SphereGeometry(.65,32,24);else if(kind==='cylinder')geo=new THREE.CylinderGeometry(.5,.5,1.1,32);else if(kind==='cone')geo=new THREE.ConeGeometry(.6,1.2,32);else if(kind==='wheel'){geo=new THREE.CylinderGeometry(.58,.58,.28,32);color='#263b50'}else if(kind==='sensor'){geo=new THREE.BoxGeometry(.9,.35,.45);color='#18b7c8'}else if(kind==='board'){geo=new THREE.BoxGeometry(1.1,.16,.8);color='#1d9b78'}else if(kind==='base'){geo=new THREE.BoxGeometry(2.8,.35,1.8);color='#287ec5'}else geo=new THREE.BoxGeometry(1,1,1);
-const m=new THREE.Mesh(geo,material(color));m.name=name||kind[0].toUpperCase()+kind.slice(1);m.castShadow=true;m.receiveShadow=true;m.position.y=kind==='wheel'?.6:.6;m.userData.kind=kind;scene.add(m);objects.push(m);select(m);refresh();return m}
+function make(kind,name,config={}){
+let geo;let color='#2588e8';
+if(kind==='sphere')geo=new THREE.SphereGeometry(.65,32,24);
+else if(kind==='cylinder')geo=new THREE.CylinderGeometry(.5,.5,1.1,32);
+else if(kind==='cone')geo=new THREE.ConeGeometry(.6,1.2,32);
+else if(kind==='wheel'){geo=new THREE.CylinderGeometry(.58,.58,.28,32);color='#263b50'}
+else if(kind==='sensor'){geo=new THREE.BoxGeometry(.9,.35,.45);color='#18b7c8'}
+else if(kind==='board'){geo=new THREE.BoxGeometry(1.1,.16,.8);color='#1d9b78'}
+else if(kind==='base'){geo=new THREE.BoxGeometry(2.8,.35,1.8);color='#287ec5'}
+else geo=new THREE.BoxGeometry(1,1,1);
+const m=new THREE.Mesh(geo,material(config.color||color));
+const id=config.id!==undefined?String(config.id):('model-'+Date.now()+'-'+(objects.length+1));
+m.name=config.name||name||kind[0].toUpperCase()+kind.slice(1);
+m.castShadow=true;m.receiveShadow=true;
+m.position.fromArray(config.position||[0,.6,0]);
+m.rotation.set(...(config.rotation||[0,0,0]));
+m.scale.fromArray(config.scale||[1,1,1]);
+m.userData={kind,id};scene.add(m);objects.push(m);select(m);refresh();return m;
+}
 function select(o){if(selected){selected.material.emissive?.setHex(0x000000)}selected=o;if(o){o.material.emissive?.setHex(0x17324a);o.material.emissiveIntensity=.12;document.querySelector('#objName').value=o.name;['x','y','z'].forEach((a,i)=>document.querySelector('#p'+a).value=o.position[['x','y','z'][i]].toFixed(2));document.querySelector('#scale').value=o.scale.x.toFixed(2);document.querySelector('#color').value='#'+o.material.color.getHexString()}refresh()}
 function refresh(){document.querySelector('#status').textContent='Ready · '+objects.length+' objects';const root=document.querySelector('#layers');root.innerHTML='';if(!objects.length)root.innerHTML='<div class="layer">No objects yet</div>';objects.forEach(o=>{const row=document.createElement('div');row.className='layer'+(o===selected?' active':'');row.textContent='◇ '+o.name;row.onclick=()=>select(o);root.appendChild(row)})}
 document.querySelectorAll('.part').forEach(el=>el.onclick=()=>make(el.dataset.kind));
 document.querySelector('#apply').onclick=()=>{if(!selected)return;selected.name=document.querySelector('#objName').value||selected.name;selected.position.set(+px.value,+py.value,+pz.value);selected.scale.setScalar(Math.max(.1,+scale.value||1));selected.material.color.set(color.value);refresh()};
 const px=document.querySelector('#px'),py=document.querySelector('#py'),pz=document.querySelector('#pz'),scale=document.querySelector('#scale'),color=document.querySelector('#color');
-document.querySelector('#duplicate').onclick=()=>{if(!selected)return;const c=selected.clone();c.material=selected.material.clone();c.position.x+=.7;c.name=selected.name+' copy';scene.add(c);objects.push(c);select(c)};
+document.querySelector('#duplicate').onclick=()=>{if(!selected)return;const c=selected.clone();c.material=selected.material.clone();c.position.x+=.7;c.name=selected.name+' copy';c.userData={...selected.userData,id:'duplicate-'+Date.now()+'-'+(objects.length+1)};scene.add(c);objects.push(c);select(c)};
 document.querySelector('#delete').onclick=()=>{if(!selected)return;scene.remove(selected);objects=objects.filter(o=>o!==selected);selected=null;document.querySelector('#objName').value='';refresh()};
 document.querySelector('#addRover').onclick=()=>{const b=make('base','Rover chassis');b.position.set(0,.75,0);for(const x of [-1,1])for(const z of [-.72,.72]){const w=make('wheel','Drive wheel');w.rotation.z=Math.PI/2;w.position.set(x*1.05,.48,z)}const board=make('board','Controller board');board.position.set(0,1.1,0);const s=make('sensor','Distance sensor');s.position.set(0,1.35,.82);select(b)};
 document.querySelector('#reset').onclick=()=>{camera.position.set(7,6,9);controls.target.set(0,1,0);controls.update()};
-document.querySelector('#export').onclick=()=>{const data={app:'OcuNova 3D Model Studio',version:'0.2-preview',objects:objects.map(o=>({name:o.name,type:o.userData.kind,position:o.position.toArray(),rotation:o.rotation.toArray(),scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()}))};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ocunova-model-scene.json';a.click();URL.revokeObjectURL(a.href)};
+document.querySelector('#export').onclick=()=>{const project=createOcuNovaProject(objects.map(o=>({id:o.userData.id,name:o.name,type:o.userData.kind,position:o.position.toArray(),rotation:[o.rotation.x,o.rotation.y,o.rotation.z],scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()})));downloadOcuNovaProject(project);document.querySelector('#status').textContent='Shared OcuNova project exported · '+objects.length+' objects';};
+const projectFile=document.querySelector('#projectFile');
+document.querySelector('#importProject').onclick=()=>projectFile.click();
+projectFile.addEventListener('change',async()=>{
+  const file=projectFile.files?.[0];if(!file)return;
+  try{
+    if(file.size>2*1024*1024)throw new Error('Project files must be smaller than 2 MB.');
+    const project=normalizeOcuNovaProject(JSON.parse(await file.text()));
+    for(const object of objects){scene.remove(object);object.geometry.dispose();object.material.dispose();}
+    objects=[];selected=null;
+    project.objects.forEach(item=>make(item.type,item.name,item));
+    select(objects.at(-1)||null);
+    document.querySelector('#status').textContent=project.project.name+' imported · '+objects.length+' objects';
+  }catch(error){document.querySelector('#status').textContent=error.message||'Could not import this project file.';}
+  finally{projectFile.value='';}
+});
 renderer.domElement.addEventListener('pointerdown',e=>{const r=renderer.domElement.getBoundingClientRect();pointer.x=((e.clientX-r.left)/r.width)*2-1;pointer.y=-((e.clientY-r.top)/r.height)*2+1;ray.setFromCamera(pointer,camera);const hits=ray.intersectObjects(objects);if(hits.length)select(hits[0].object)});
 function resize(){const w=host.clientWidth,h=host.clientHeight;camera.aspect=w/h;camera.updateProjectionMatrix();renderer.setSize(w,h,false)}new ResizeObserver(resize).observe(host);resize();
 function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}animate();refresh();
