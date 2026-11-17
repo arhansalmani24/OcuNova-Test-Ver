@@ -90,7 +90,7 @@ function makeGeometry(type){
 }
 function addObject(type='box',color,data={}){
   const id=data.id!==undefined?String(data.id):String(++serial);
-  if(/^\\d+$/.test(id))serial=Math.max(serial,Number(id));
+  if(/^\d+$/.test(id))serial=Math.max(serial,Number(id));
   const palette=['#3979e8','#32bfd0','#8972e9','#f2a45c'];
   const material=new THREE.MeshStandardMaterial({color:data.color||color||palette[(serial-1+palette.length)%palette.length],metalness:.18,roughness:.34});
   const mesh=new THREE.Mesh(makeGeometry(type),material);
