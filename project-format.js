@@ -14,10 +14,12 @@ function readVector(value, fallback, label, positive = false) {
   if (!Array.isArray(source) || source.length !== 3) {
     throw new Error(label + ' must contain exactly three numbers.');
   }
-  const vector = source.map(Number);
-  if (!vector.every(Number.isFinite)) {
-    throw new Error(label + ' contains an invalid number.');
-  }
+  const vector = source.map(number => {
+    if (typeof number !== 'number' || !Number.isFinite(number)) {
+      throw new Error(label + ' must contain finite numeric values.');
+    }
+    return number;
+  });
   if (positive && vector.some(number => number <= 0 || number > 100)) {
     throw new Error(label + ' values must be greater than 0 and no more than 100.');
   }
