@@ -22,7 +22,7 @@ The original `index.html` experiment is preserved. Development prototypes are be
 
 The 3D Workspace and Model Studio now use the same `ocunova-project-v1` JSON format through `project-format.js`. Use Export project in either tool, then Import JSON in the other to continue editing the same scene. The format preserves object IDs, names, supported shape types, position, rotation, scale and material color. Supported shapes are box, sphere, cylinder, cone, wheel, sensor, control board and rover base. The importer also accepts the earlier Workspace `ocunova-scene-v1` export and the previous OcuNova Model Studio export structure.
 
-Imports are validated before replacing the current scene, limited to 100 objects and JSON files smaller than 2 MB, and reject unsupported shapes, duplicate IDs, invalid colors and out-of-range transforms. This is a local file hand-off: there is no cloud sync, account storage, collaboration, AI generation or server-side project database. Camera settings, lighting, viewport state and arbitrary custom geometry are not part of the shared format. Circuit Forge continues to use its own separate visual-layout JSON; circuit layouts and electrical simulation are not included in this 3D format.
+Imports are validated before replacing the current scene, limited to 100 objects and JSON files smaller than 2 MB, and reject unsupported shapes, duplicate IDs, invalid colors, non-numeric or non-finite transform values, and out-of-range transforms. Position and rotation vectors must contain three finite numbers; scale values must be positive and within the supported range. This is a local file hand-off: there is no cloud sync, account storage, collaboration, AI generation or server-side project database. Camera settings, lighting, viewport state and arbitrary custom geometry are not part of the shared format. Circuit Forge continues to use its own separate visual-layout JSON; circuit layouts and electrical simulation are not included in this 3D format.
 
 ## Sensor Atlas scope and limitations
 
@@ -47,6 +47,10 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 5. Add secure AI-assisted project generation only when a server-side integration is available.
 6. Add verified PDF/PPT project documentation exports.
 
+## Automated project-format tests
+
+Run `npm test` with Node.js 18 or later to execute the shared 3D project-format regression suite. It uses Node's built-in test runner and has no third-party package dependencies. The tests cover canonical project creation and normalisation, both supported legacy export shapes, defaults, label cleaning, the 100-object limit, duplicate IDs, supported shapes, colour validation, numeric vectors and transform bounds.
+
 ## Development and privacy principles
 
 - Preserve the original experiment and work on `ocunova-revival` until changes are explicitly approved for integration.
@@ -63,6 +67,7 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 - The shared `project-format.js`, `workspace.html` and `model-studio.html` files were fetched back from GitHub and parsed with the V8 JavaScript parser. The shared-format helper was exercised with a two-object scene (including rover base and wheel), both previous 3D export structures, and rejection of an unsupported shape.
 - The Guided Learning Path and updated landing page were fetched back from GitHub; their inline JavaScript passed V8 syntax parsing, five lesson modules and 15 tasks were confirmed, and the lesson tool destinations were checked against the repository entry points.
 - The Sensor Atlas and updated landing page were fetched back from GitHub. JavaScript syntax parsing passed for both inline scripts; the catalogue data check confirmed 12 unique entries with the required fields and starter examples.
+- The shared project-format regression suite was run with `npm test`: 12 tests passed using Node's built-in test runner; no external dependencies are required.
 - The shared 3D project workflow has not yet been browser-tested between the two pages; manual export/import checks in a WebGL-capable browser are still required.
 - These are source-level checks only. The Guided Learning Path has not been browser-tested across devices; local-storage persistence and interactions still need manual browser testing. The Sensor Atlas has not been browser-tested or connected to physical sensors; starter sketches have not been compiled against hardware.
 - The Physics Lab has not yet been browser-tested across devices or independently validated against a physics reference.
