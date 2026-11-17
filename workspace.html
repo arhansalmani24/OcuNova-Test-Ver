@@ -41,7 +41,7 @@ button,input{font:inherit}button{cursor:pointer}.shell{max-width:1600px;margin:a
       <div class="toolgroup">
         <button class="toolbtn" id="addCube">＋ Cube</button>
         <button class="toolbtn" id="addSphere">＋ Sphere</button>
-        <button class="toolbtn primary" id="exportScene">Export scene</button>
+        <button class="toolbtn" id="importProject">Import JSON</button><button class="toolbtn primary" id="exportScene">Export project</button><input id="projectFile" type="file" accept=".json,application/json" hidden aria-label="Choose an OcuNova project JSON file">
       </div>
     </div>
     <section class="viewport-card">
@@ -64,6 +64,7 @@ button,input{font:inherit}button{cursor:pointer}.shell{max-width:1600px;margin:a
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { createOcuNovaProject, downloadOcuNovaProject, normalizeOcuNovaProject } from './project-format.js';
 const canvas=document.querySelector('#scene'), viewport=canvas.parentElement;
 const scene=new THREE.Scene(); scene.background=new THREE.Color('#f7faff');
 scene.fog=new THREE.Fog('#f7faff',13,28);
@@ -77,10 +78,34 @@ const grid=new THREE.GridHelper(14,28,0xc4d5e9,0xe2eaf4);grid.position.y=-.012;s
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:'#f7faff',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.025;floor.receiveShadow=true;scene.add(floor);
 const objects=[];let selected=null,serial=0,rotateMode=false;
 const mats={blue:new THREE.MeshStandardMaterial({color:'#3979e8',metalness:.22,roughness:.32}),cyan:new THREE.MeshStandardMaterial({color:'#32bfd0',metalness:.18,roughness:.3}),violet:new THREE.MeshStandardMaterial({color:'#8972e9',metalness:.2,roughness:.34}),orange:new THREE.MeshStandardMaterial({color:'#f2a45c',metalness:.15,roughness:.38})};
-function makeGeometry(type){if(type==='sphere')return new THREE.SphereGeometry(.72,48,32);if(type==='cylinder')return new THREE.CylinderGeometry(.55,.55,1.35,48);return new THREE.BoxGeometry(1.25,1.25,1.25)}
-function addObject(type='box',color){serial++;const material=(color?new THREE.MeshStandardMaterial({color,metalness:.18,roughness:.34}):mats[['blue','cyan','violet','orange'][(serial-1)%4]]).clone();const mesh=new THREE.Mesh(makeGeometry(type),material);mesh.position.set((objects.length%3-1)*1.65,.72,Math.floor(objects.length/3)*1.5);mesh.castShadow=true;mesh.receiveShadow=true;mesh.userData={id:serial,name:(type==='box'?'Cube':type[0].toUpperCase()+type.slice(1))+' '+serial,type};scene.add(mesh);objects.push(mesh);select(mesh);renderList();notify(mesh.userData.name+' added to scene');}
+function makeGeometry(type){
+  if(type==='sphere')return new THREE.SphereGeometry(.72,48,32);
+  if(type==='cylinder')return new THREE.CylinderGeometry(.55,.55,1.35,48);
+  if(type==='cone')return new THREE.ConeGeometry(.6,1.2,32);
+  if(type==='wheel')return new THREE.CylinderGeometry(.58,.58,.28,32);
+  if(type==='sensor')return new THREE.BoxGeometry(.9,.35,.45);
+  if(type==='board')return new THREE.BoxGeometry(1.1,.16,.8);
+  if(type==='base')return new THREE.BoxGeometry(2.8,.35,1.8);
+  return new THREE.BoxGeometry(1.25,1.25,1.25);
+}
+function addObject(type='box',color,data={}){
+  const id=data.id!==undefined?String(data.id):String(++serial);
+  if(/^\\d+$/.test(id))serial=Math.max(serial,Number(id));
+  const palette=['#3979e8','#32bfd0','#8972e9','#f2a45c'];
+  const material=new THREE.MeshStandardMaterial({color:data.color||color||palette[(serial-1+palette.length)%palette.length],metalness:.18,roughness:.34});
+  const mesh=new THREE.Mesh(makeGeometry(type),material);
+  const defaultPosition=[(objects.length%3-1)*1.65,.72,Math.floor(objects.length/3)*1.5];
+  mesh.position.fromArray(data.position||defaultPosition);
+  mesh.rotation.set(...(data.rotation||[0,0,0]));
+  mesh.scale.fromArray(data.scale||[1,1,1]);
+  mesh.castShadow=true;mesh.receiveShadow=true;
+  mesh.userData={id,name:data.name||((type==='box'?'Cube':type[0].toUpperCase()+type.slice(1))+' '+id),type};
+  scene.add(mesh);objects.push(mesh);select(mesh);
+  if(!data.silent)notify(mesh.userData.name+' added to scene');
+  return mesh;
+}
 function select(mesh){selected=mesh;renderList();renderProperties();}
-function renderList(){const list=document.querySelector('#objectList');list.innerHTML='';if(!objects.length){list.innerHTML='<div class="empty">Your scene is empty. Add a shape to begin.</div>';return;}objects.forEach(o=>{const b=document.createElement('button');b.className='object-item'+(o===selected?' selected':'');const glyph=o.userData.type==='sphere'?'◉':o.userData.type==='cylinder'?'⬭':'▧';b.innerHTML='<span class="object-icon">'+glyph+'</span><span class="object-meta"><strong></strong><small>3D mesh · '+o.userData.type+'</small></span><span class="dot"></span>';b.querySelector('strong').textContent=o.userData.name;b.onclick=()=>select(o);list.append(b);});}
+function renderList(){const list=document.querySelector('#objectList');list.innerHTML='';if(!objects.length){list.innerHTML='<div class="empty">Your scene is empty. Add a shape to begin.</div>';return;}objects.forEach(o=>{const b=document.createElement('button');b.className='object-item'+(o===selected?' selected':'');const glyph=o.userData.type==='sphere'?'◉':o.userData.type==='cylinder'?'⬭':o.userData.type==='wheel'?'◉':o.userData.type==='sensor'?'◈':o.userData.type==='board'?'▦':'▧';b.innerHTML='<span class="object-icon">'+glyph+'</span><span class="object-meta"><strong></strong><small>3D mesh · '+o.userData.type+'</small></span><span class="dot"></span>';b.querySelector('strong').textContent=o.userData.name;b.onclick=()=>select(o);list.append(b);});}
 function renderProperties(){const wrap=document.querySelector('#properties'),hint=document.querySelector('#propertyHint');if(!selected){hint.textContent='Choose an object in the scene.';wrap.innerHTML='<div class="empty">No object selected</div>';return;}hint.textContent=selected.userData.name;const p=selected.position,s=selected.scale;wrap.innerHTML='';const rows=[['Position X','x',p.x],['Position Y','y',p.y],['Position Z','z',p.z],['Scale','scale',s.x]];rows.forEach(([label,key,val])=>{const row=document.createElement('label');row.className='prop-row';const name=document.createElement('span');name.textContent=label;const input=document.createElement('input');input.type='number';input.step='.1';input.value=Number(val).toFixed(1);input.addEventListener('change',()=>{const n=Number(input.value);if(!Number.isFinite(n))return;if(key==='scale'){const v=Math.max(.1,Math.min(4,n));selected.scale.setScalar(v);input.value=v;}else selected.position[key]=n;});row.append(name,input);wrap.append(row);});const row=document.createElement('label');row.className='prop-row';row.innerHTML='<span>Material color</span>';const color=document.createElement('input');color.type='color';color.value='#'+selected.material.color.getHexString();color.oninput=()=>selected.material.color.set(color.value);row.append(color);wrap.append(row);const del=document.createElement('button');del.className='toolbtn';del.style.cssText='margin-top:12px;color:#c45b64;background:#fff4f4;width:100%';del.textContent='Remove object';del.onclick=()=>{scene.remove(selected);const i=objects.indexOf(selected);if(i>=0)objects.splice(i,1);selected=objects.at(-1)||null;renderList();renderProperties();};wrap.append(del);}
 const raycaster=new THREE.Raycaster(),pointer=new THREE.Vector2();let down=null;
 canvas.addEventListener('pointerdown',e=>down={x:e.clientX,y:e.clientY});
@@ -97,7 +122,22 @@ document.querySelector('#zoomIn').onclick=()=>{camera.position.multiplyScalar(.8
 document.querySelector('#fullscreen').onclick=()=>{if(!document.fullscreenElement)viewport.requestFullscreen?.();else document.exitFullscreen?.();};
 document.querySelector('#generateBtn').onclick=()=>{const value=document.querySelector('#promptInput').value.trim().toLowerCase();if(!value){notify('Describe a shape first');return;}const type=value.includes('sphere')||value.includes('ball')?'sphere':value.includes('cylinder')?'cylinder':'box';let color;if(value.includes('red'))color='#ef626c';else if(value.includes('green'))color='#38b889';else if(value.includes('purple'))color='#8972e9';else if(value.includes('orange'))color='#f2a45c';else if(value.includes('cyan'))color='#32bfd0';else if(value.includes('blue'))color='#3979e8';addObject(type,color);document.querySelector('#promptInput').value='';};
 document.querySelector('#promptInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.querySelector('#generateBtn').click();});
-document.querySelector('#exportScene').onclick=()=>{const data={application:'OcuNova',format:'ocunova-scene-v1',objects:objects.map(o=>({name:o.userData.name,type:o.userData.type,position:o.position.toArray(),scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()}))};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='ocunova-scene.json';a.click();URL.revokeObjectURL(url);notify('Scene description exported');};
+document.querySelector('#exportScene').onclick=()=>{const project=createOcuNovaProject(objects.map(o=>({id:o.userData.id,name:o.userData.name,type:o.userData.type,position:o.position.toArray(),rotation:[o.rotation.x,o.rotation.y,o.rotation.z],scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()})));downloadOcuNovaProject(project);notify('Shared OcuNova project exported');};
+const projectFile=document.querySelector('#projectFile');
+document.querySelector('#importProject').onclick=()=>projectFile.click();
+projectFile.addEventListener('change',async()=>{
+  const file=projectFile.files?.[0];if(!file)return;
+  try{
+    if(file.size>2*1024*1024)throw new Error('Project files must be smaller than 2 MB.');
+    const project=normalizeOcuNovaProject(JSON.parse(await file.text()));
+    for(const mesh of objects){scene.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();}
+    objects.length=0;selected=null;
+    project.objects.forEach(item=>addObject(item.type,item.color,{...item,silent:true}));
+    select(objects.at(-1)||null);
+    notify(project.project.name+' imported · '+objects.length+' objects');
+  }catch(error){notify(error.message||'Could not import this project file.');}
+  finally{projectFile.value='';}
+});
 addObject('box');addObject('sphere');
 </script>
 </body>
