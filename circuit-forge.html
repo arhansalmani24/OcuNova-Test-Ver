@@ -19,7 +19,7 @@ button,input,select{font:inherit}button{border:1px solid #b8dcff;border-radius:1
 @media(max-width:680px){header{padding:0 13px}.tag{display:none}.layout{display:flex;flex-direction:column;padding:9px}.palette{grid-template-columns:repeat(2,minmax(0,1fr))}.part{font-size:11px;padding:7px}.part .ico{width:28px;height:28px}.workspace{min-height:470px}.board{width:94%;height:365px}.device{transform:scale(.83);transform-origin:top left}.rightContent{grid-template-columns:1fr}.toolbar button{padding:8px;font-size:11px}.panel h3{padding:12px}.mobileTitle{display:block;padding:0 4px 8px;color:#6a86a6;font-size:11px;letter-spacing:2px}}
 </style></head>
 <body>
-<header><div><span class="brand">◇ OCU<span>NOVA</span></span><span class="tag">IMAGINE. DESIGN. SIMULATE. BUILD.</span></div><div style="display:flex;gap:8px"><button id="clearBtn">Reset</button><button class="primary" id="exportBtn">↓ Export project</button></div></header>
+<header><div><span class="brand">◇ OCU<span>NOVA</span></span><span class="tag">IMAGINE. DESIGN. SIMULATE. BUILD.</span></div><div style="display:flex;gap:8px;align-items:center"><button id="clearBtn">Reset board</button><button id="importBtn">↑ Import project</button><input id="projectFile" type="file" accept=".json,application/json" hidden aria-label="Choose an OcuNova project JSON file"><button class="primary" id="exportBtn">↓ Export project</button></div></header>
 <main class="layout">
 <aside class="panel"><h3>Component library</h3><div class="palette" id="palette"></div></aside>
 <section class="center"><div class="mobileTitle">CIRCUIT FORGE · BUILD. CONNECT. LEARN.</div><div class="toolbar">
@@ -29,10 +29,11 @@ button,input,select{font:inherit}button{border:1px solid #b8dcff;border-radius:1
 <div><div style="font-weight:750;margin-bottom:9px">Component details</div><div id="inspector" class="hint">Select a component on the board to inspect it.</div></div>
 <div class="prompt"><div style="font-weight:750">AI circuit assistant <span style="font-size:9px;color:#00a2d8">LOCAL DEMO</span></div><div class="field"><label for="prompt">Describe a learning circuit</label><textarea id="prompt" placeholder="e.g. Create an Arduino LED blink demo"></textarea></div><button class="primary" id="generateBtn">✦ Generate demo layout</button><div class="hint">This demo recognises a few example requests and arranges sample components. It is not connected to an AI model and does not electrically simulate a circuit.</div></div>
 <div><div style="font-weight:750;margin-bottom:7px">Project overview</div><div class="stat"><span>Components</span><b id="compStat">0</b></div><div class="stat"><span>Connections</span><b id="wireStat">0</b></div><div class="stat"><span>Mode</span><b id="modeStat">Select</b></div></div>
-<div class="hint"><b>How to connect:</b><br>Choose “Connect wires”, then tap one yellow port and another yellow port. Drag components to arrange your board. This is an educational UI prototype, not a validated wiring diagram.</div>
+<div class="hint"><b>How to connect:</b><br>Choose “Connect wires”, then tap one yellow port and another yellow port. Drag components to arrange your board. This is an educational UI prototype, not a validated wiring diagram. Shared project files can also carry a 3D scene between Circuit Forge and the 3D tools.</div>
 </div></aside>
 </main>
-<script>
+<script type="module">
+import { createOcuNovaProject, downloadOcuNovaProject, normalizeOcuNovaProject } from "./project-format.js";
 const defs={
 arduino:{name:"Arduino UNO",sub:"Microcontroller",icon:"▦",pins:["5V","GND","D2","D3"],desc:"A beginner-friendly microcontroller board used to read inputs and control outputs."},
 ultrasonic:{name:"HC-SR04",sub:"Ultrasonic sensor",icon:"◉",pins:["VCC","TRIG","ECHO","GND"],desc:"Measures distance using ultrasonic sound pulses. Typical learning range: about 2–400 cm."},
@@ -42,7 +43,7 @@ resistor:{name:"Resistor",sub:"Passive component",icon:"▤",pins:["A","B"],desc
 breadboard:{name:"Breadboard",sub:"Prototyping",icon:"▦",pins:["+" ,"−","A","B"],desc:"A solderless board for building temporary electronic prototypes."},
 battery:{name:"Battery 7.4V",sub:"Power source",icon:"▰",pins:["+","−"],desc:"Illustrative power source. Confirm voltage and polarity against every component before real use."}
 };
-let items=[],wires=[],selected=null,mode="select",pending=null,drag=null,undo=[];
+let items=[],wires=[],selected=null,mode="select",pending=null,drag=null,undo=[],linkedObjects=[],projectName="Circuit project";
 const $=id=>document.getElementById(id),board=$("board"),devices=$("devices"),svg=$("wireSvg");
 function palette(){ $("palette").innerHTML=Object.entries(defs).map(([k,d])=>'<button class="part" data-add="'+k+'"><span class="ico">'+d.icon+'</span><span>'+d.name+'<small>'+d.sub+'</small></span></button>').join("");}
 function add(type,x,y){let id="c"+Date.now()+Math.random().toString(16).slice(2,5);items.push({id,type,x:x??(35+(items.length%3)*185),y:y??(75+Math.floor(items.length/3)*120)});render();}
@@ -65,6 +66,42 @@ $("clearBtn").onclick=reset;
 function demo(){reset();add("arduino",35,140);add("led",270,110);add("resistor",270,245);add("breadboard",430,150);$("statusText").textContent="Demo layout added · arrange components and connect ports";} 
 $("autoBtn").onclick=demo;
 $("generateBtn").onclick=()=>{let p=$("prompt").value.toLowerCase();if(!p.trim()){$("statusText").textContent="Enter a circuit idea first";return;}demo();if(p.includes("distance")||p.includes("ultrasonic")||p.includes("obstacle")){add("ultrasonic",430,45);add("servo",560,260);}else if(p.includes("servo")||p.includes("motor")){add("servo",450,80);}else if(p.includes("led")||p.includes("blink")){add("resistor",270,245);}else{add("ultrasonic",430,45);} $("statusText").textContent="Sample layout created from prompt · not AI-generated or simulated";};
-$("exportBtn").onclick=()=>{let data={app:"OcuNova Circuit Forge",version:"prototype-0.1",note:"Visual learning prototype only; connections are not electrically validated.",components:items.map(i=>({id:i.id,type:i.type,name:defs[i.type].name,x:i.x,y:i.y})),connections:wires};let blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="ocunova-circuit-project.json";a.click();URL.revokeObjectURL(url);$("statusText").textContent="Project JSON exported";}
+function sharedCircuit(){
+  const maxX=Math.max(1,board.clientWidth-110),maxY=Math.max(1,board.clientHeight-85);
+  return {
+    components:items.map(item=>({id:item.id,type:item.type,x:Math.max(0,Math.min(1,item.x/maxX)),y:Math.max(0,Math.min(1,item.y/maxY))})),
+    connections:wires.map(wire=>({a:wire.a,ap:wire.ap,b:wire.b,bp:wire.bp,color:wire.color}))
+  };
+}
+function loadCircuit(circuit){
+  const maxX=Math.max(1,board.clientWidth-110),maxY=Math.max(1,board.clientHeight-85);
+  items=circuit.components.map(item=>({id:item.id,type:item.type,x:item.x*maxX,y:item.y*maxY}));
+  wires=circuit.connections.map(wire=>({...wire}));
+  selected=null;pending=null;drag=null;undo=[];render();
+}
+$("exportBtn").onclick=()=>{
+  const project=createOcuNovaProject(linkedObjects,projectName,sharedCircuit());
+  downloadOcuNovaProject(project);
+  $("statusText").textContent="Shared project exported · "+items.length+" circuit parts · "+wires.length+" visual connections · "+linkedObjects.length+" 3D objects preserved";
+};
+const projectFile=$("projectFile");
+$("importBtn").onclick=()=>projectFile.click();
+projectFile.addEventListener("change",async()=>{
+  const file=projectFile.files?.[0];if(!file)return;
+  try{
+    if(file.size>2*1024*1024)throw new Error("Project files must be smaller than 2 MB.");
+    const project=normalizeOcuNovaProject(JSON.parse(await file.text()));
+    linkedObjects=project.objects;
+    projectName=project.project.name==="Untitled project"?"Circuit project":project.project.name;
+    if(project.circuit){
+      loadCircuit(project.circuit);
+      $("statusText").textContent=projectName+" imported · "+items.length+" circuit parts · "+linkedObjects.length+" 3D objects preserved";
+    }else{
+      items=[];wires=[];selected=null;pending=null;undo=[];render();
+      $("statusText").textContent="3D scene imported and preserved · add circuit components to continue";
+    }
+  }catch(error){$("statusText").textContent=error.message||"Could not import this project file.";}
+  finally{projectFile.value="";}
+});
 window.addEventListener("resize",drawWires);palette();render();
 </script></body></html>
