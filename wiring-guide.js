@@ -47,12 +47,13 @@ function endpoint(component, pinIndex) {
   if (!component) return { known: false, role: "unknown", label: "Unknown component" };
   const type = String(component.type || "").toLowerCase();
   const pin = Number.isInteger(pinIndex) && pinIndex >= 0 ? PIN_GUIDE[type]?.[pinIndex] : null;
+  const role = pin?.role ?? "unknown";
   return {
-    known: Boolean(pin),
+    known: Boolean(pin) && role !== "passive" && role !== "unclassified",
     componentId: String(component.id ?? ""),
     type,
     pin: pin?.label ?? ("Port " + (Number.isInteger(pinIndex) && pinIndex >= 0 ? pinIndex + 1 : "?")),
-    role: pin?.role ?? "unknown"
+    role
   };
 }
 
