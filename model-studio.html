@@ -54,7 +54,7 @@ const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});renderer.set
 const controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.target.set(0,1,0);
 scene.add(new THREE.HemisphereLight(0xffffff,0x9bbbd1,2));const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(5,9,6);key.castShadow=true;scene.add(key);
 const grid=new THREE.GridHelper(18,36,0x9fc5df,0xd5e6f2);scene.add(grid);const ground=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:0xf4faff,roughness:1}));ground.rotation.x=-Math.PI/2;ground.position.y=-.025;ground.receiveShadow=true;scene.add(ground);
-let objects=[],selected=null;const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
+let objects=[],selected=null,linkedCircuit=null,projectName='Untitled project';const ray=new THREE.Raycaster(),pointer=new THREE.Vector2();
 function material(color){return new THREE.MeshStandardMaterial({color,metalness:.22,roughness:.38})}
 function make(kind,name,config={}){
 let geo;let color='#2588e8';
@@ -84,7 +84,7 @@ document.querySelector('#duplicate').onclick=()=>{if(!selected)return;const c=se
 document.querySelector('#delete').onclick=()=>{if(!selected)return;scene.remove(selected);objects=objects.filter(o=>o!==selected);selected=null;document.querySelector('#objName').value='';refresh()};
 document.querySelector('#addRover').onclick=()=>{const b=make('base','Rover chassis');b.position.set(0,.75,0);for(const x of [-1,1])for(const z of [-.72,.72]){const w=make('wheel','Drive wheel');w.rotation.z=Math.PI/2;w.position.set(x*1.05,.48,z)}const board=make('board','Controller board');board.position.set(0,1.1,0);const s=make('sensor','Distance sensor');s.position.set(0,1.35,.82);select(b)};
 document.querySelector('#reset').onclick=()=>{camera.position.set(7,6,9);controls.target.set(0,1,0);controls.update()};
-document.querySelector('#export').onclick=()=>{const project=createOcuNovaProject(objects.map(o=>({id:o.userData.id,name:o.name,type:o.userData.kind,position:o.position.toArray(),rotation:[o.rotation.x,o.rotation.y,o.rotation.z],scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()})));downloadOcuNovaProject(project);document.querySelector('#status').textContent='Shared OcuNova project exported · '+objects.length+' objects';};
+document.querySelector('#export').onclick=()=>{const project=createOcuNovaProject(objects.map(o=>({id:o.userData.id,name:o.name,type:o.userData.kind,position:o.position.toArray(),rotation:[o.rotation.x,o.rotation.y,o.rotation.z],scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()})),projectName,linkedCircuit);downloadOcuNovaProject(project);document.querySelector('#status').textContent='Shared project exported · '+objects.length+' 3D objects'+(linkedCircuit?' · circuit preserved':'');};
 const projectFile=document.querySelector('#projectFile');
 document.querySelector('#importProject').onclick=()=>projectFile.click();
 projectFile.addEventListener('change',async()=>{
@@ -92,11 +92,12 @@ projectFile.addEventListener('change',async()=>{
   try{
     if(file.size>2*1024*1024)throw new Error('Project files must be smaller than 2 MB.');
     const project=normalizeOcuNovaProject(JSON.parse(await file.text()));
+    projectName=project.project.name;linkedCircuit=project.circuit||null;
     for(const object of objects){scene.remove(object);object.geometry.dispose();object.material.dispose();}
     objects=[];selected=null;
     project.objects.forEach(item=>make(item.type,item.name,item));
     select(objects.at(-1)||null);
-    document.querySelector('#status').textContent=project.project.name+' imported · '+objects.length+' objects';
+    document.querySelector('#status').textContent=project.project.name+' imported · '+objects.length+' objects'+(linkedCircuit?' · circuit preserved':'');
   }catch(error){document.querySelector('#status').textContent=error.message||'Could not import this project file.';}
   finally{projectFile.value='';}
 });
