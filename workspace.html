@@ -76,7 +76,7 @@ const key=new THREE.DirectionalLight(0xffffff,2.2);key.position.set(4,8,5);key.c
 const fill=new THREE.DirectionalLight(0x8bdfff,1.1);fill.position.set(-5,3,-4);scene.add(fill);
 const grid=new THREE.GridHelper(14,28,0xc4d5e9,0xe2eaf4);grid.position.y=-.012;scene.add(grid);
 const floor=new THREE.Mesh(new THREE.PlaneGeometry(200,200),new THREE.MeshStandardMaterial({color:'#f7faff',roughness:1}));floor.rotation.x=-Math.PI/2;floor.position.y=-.025;floor.receiveShadow=true;scene.add(floor);
-const objects=[];let selected=null,serial=0,rotateMode=false;
+const objects=[];let selected=null,serial=0,rotateMode=false,linkedCircuit=null,projectName='Untitled project';
 const mats={blue:new THREE.MeshStandardMaterial({color:'#3979e8',metalness:.22,roughness:.32}),cyan:new THREE.MeshStandardMaterial({color:'#32bfd0',metalness:.18,roughness:.3}),violet:new THREE.MeshStandardMaterial({color:'#8972e9',metalness:.2,roughness:.34}),orange:new THREE.MeshStandardMaterial({color:'#f2a45c',metalness:.15,roughness:.38})};
 function makeGeometry(type){
   if(type==='sphere')return new THREE.SphereGeometry(.72,48,32);
@@ -122,7 +122,7 @@ document.querySelector('#zoomIn').onclick=()=>{camera.position.multiplyScalar(.8
 document.querySelector('#fullscreen').onclick=()=>{if(!document.fullscreenElement)viewport.requestFullscreen?.();else document.exitFullscreen?.();};
 document.querySelector('#generateBtn').onclick=()=>{const value=document.querySelector('#promptInput').value.trim().toLowerCase();if(!value){notify('Describe a shape first');return;}const type=value.includes('sphere')||value.includes('ball')?'sphere':value.includes('cylinder')?'cylinder':'box';let color;if(value.includes('red'))color='#ef626c';else if(value.includes('green'))color='#38b889';else if(value.includes('purple'))color='#8972e9';else if(value.includes('orange'))color='#f2a45c';else if(value.includes('cyan'))color='#32bfd0';else if(value.includes('blue'))color='#3979e8';addObject(type,color);document.querySelector('#promptInput').value='';};
 document.querySelector('#promptInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.querySelector('#generateBtn').click();});
-document.querySelector('#exportScene').onclick=()=>{const project=createOcuNovaProject(objects.map(o=>({id:o.userData.id,name:o.userData.name,type:o.userData.type,position:o.position.toArray(),rotation:[o.rotation.x,o.rotation.y,o.rotation.z],scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()})));downloadOcuNovaProject(project);notify('Shared OcuNova project exported');};
+document.querySelector('#exportScene').onclick=()=>{const project=createOcuNovaProject(objects.map(o=>({id:o.userData.id,name:o.userData.name,type:o.userData.type,position:o.position.toArray(),rotation:[o.rotation.x,o.rotation.y,o.rotation.z],scale:o.scale.toArray(),color:'#'+o.material.color.getHexString()})),projectName,linkedCircuit);downloadOcuNovaProject(project);notify('Shared project exported · '+objects.length+' 3D objects'+(linkedCircuit?' · circuit preserved':''));};
 const projectFile=document.querySelector('#projectFile');
 document.querySelector('#importProject').onclick=()=>projectFile.click();
 projectFile.addEventListener('change',async()=>{
@@ -130,11 +130,12 @@ projectFile.addEventListener('change',async()=>{
   try{
     if(file.size>2*1024*1024)throw new Error('Project files must be smaller than 2 MB.');
     const project=normalizeOcuNovaProject(JSON.parse(await file.text()));
+    projectName=project.project.name;linkedCircuit=project.circuit||null;
     for(const mesh of objects){scene.remove(mesh);mesh.geometry.dispose();mesh.material.dispose();}
     objects.length=0;selected=null;
     project.objects.forEach(item=>addObject(item.type,item.color,{...item,silent:true}));
     select(objects.at(-1)||null);
-    notify(project.project.name+' imported · '+objects.length+' objects');
+    notify(project.project.name+' imported · '+objects.length+' objects'+(linkedCircuit?' · circuit preserved':''));
   }catch(error){notify(error.message||'Could not import this project file.');}
   finally{projectFile.value='';}
 });
