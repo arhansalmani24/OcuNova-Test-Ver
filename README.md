@@ -4,7 +4,7 @@ OcuNova is being developed as an AI-assisted, interactive engineering and learni
 
 ## Repository status
 
-The original `index.html` experiment is preserved. Development prototypes are being added on the `ocunova-revival` branch; the default `main` branch is intentionally left unchanged.
+The original `index.html` experiment is preserved. Development prototypes are being added on the `ocunova-revival` branch; the default `main` branch is intentionally left unchanged. The GitHub Pages workflow is manual-dispatch only; pushes to the development branch do not publish a deployment.
 
 ## Current entry points
 
