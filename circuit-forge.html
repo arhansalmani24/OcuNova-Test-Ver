@@ -69,7 +69,7 @@ function renderWiringGuide(){
     return '<article class="guide-item '+(item.severity==="danger"?"danger":"warning")+'"><div class="guide-item-title">'+guideEscape(item.title)+'</div><div class="guide-item-route">'+guideEscape(route)+'</div><p>'+guideEscape(item.message)+'</p></article>';
   }).join("");
   const notes=report.notes.map(note=>'<div class="guide-note"><b>'+guideEscape(note.title)+'</b><p>'+guideEscape(note.message)+'</p></div>').join("");
-  const unknown=report.unclassifiedConnections?'<div class="guide-clear">'+report.unclassifiedConnections+' connection(s) include a port the guide does not recognise. Check those manually.</div>':"";
+  const unknown=report.unclassifiedConnections?'<div class="guide-clear">'+report.unclassifiedConnections+' connection(s) include a port role the guide cannot assess. Check those manually.</div>':"";
   const result=report.findings.length?findings:'<div class="guide-clear">No obvious label-level conflict was detected. This is not a safety clearance.</div>';
   target.innerHTML='<div class="guide-summary">'+guideEscape(summary)+'</div>'+result+unknown+(notes?'<div class="guide-notes">'+notes+'</div>':'')+'<div class="guide-disclaimer">Advisory rules only. This guide does not build electrical nets, model breadboard continuity, check component values, calculate voltage/current, verify pin modes or certify a real circuit. Confirm the exact board and module datasheets before hardware use.</div>';
 }
