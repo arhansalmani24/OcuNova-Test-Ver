@@ -79,8 +79,6 @@ export function analyzeCircuitWiring(circuit) {
     const b = endpoint(byId.get(String(connection?.b ?? "")), connection?.bp);
     if (!a.known || !b.known) unclassifiedConnections += 1;
 
-    const pair = a.role + "|" + b.role;
-    const reversedPair = b.role + "|" + a.role;
     const hasSourceAndGround =
       (a.role === "source-positive" && GROUND_ROLES.has(b.role)) ||
       (b.role === "source-positive" && GROUND_ROLES.has(a.role));
@@ -144,10 +142,6 @@ export function analyzeCircuitWiring(circuit) {
       return;
     }
 
-    // Keep these variables intentionally local to make the recognised pair
-    // classes explicit while leaving all other connections unclassified.
-    void pair;
-    void reversedPair;
   });
 
   const notes = [];
