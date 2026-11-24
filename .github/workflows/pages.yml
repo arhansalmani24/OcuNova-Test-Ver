@@ -1,9 +1,6 @@
 name: Deploy OcuNova preview
 
 on:
-  push:
-    branches:
-      - ocunova-revival
   workflow_dispatch:
 
 permissions:
