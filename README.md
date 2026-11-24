@@ -26,6 +26,12 @@ The 3D section preserves object IDs, names, supported shape types, position, rot
 
 Imports are validated before the current project is replaced. Limits are 100 3D objects, 100 circuit components, 250 visual connections and JSON files smaller than 2 MB. Validation rejects unsupported component types, duplicate IDs, invalid positions, dangling connection references, invalid port indexes, duplicate connections, invalid colors and invalid 3D transforms. Circuit validation is structural only: it checks that a visual wire references existing demo components and in-range port indexes. It does not verify electrical compatibility, pin functions, voltage, current, power, polarity, shorts or physical wiring, and there is no electrical simulator. This remains a local file hand-off with no cloud sync, account storage, collaboration, AI generation or server-side project database. Camera settings, lighting, viewport state and arbitrary custom geometry are not part of the shared format.
 
+## Circuit Forge Wiring Guide scope and limitations
+
+Circuit Forge now includes a client-side, label-level Wiring Guide powered by `wiring-guide.js`. It reviews direct visual connections for a small set of obvious cases: a labelled positive rail connected to ground, the palette's nominal 7.4 V battery connected directly to a 5 V/logic/low-voltage pin, and a fixed 5 V rail connected directly to a signal pin. It also displays contextual reminders for LEDs, servos, the HC-SR04 and breadboards. Ten focused regression tests cover the advisory rules.
+
+This is not an electrical simulator, netlist builder or circuit safety checker. It cannot infer indirect paths, breadboard internal continuity, board variants, pin modes, component values, voltage drops, current, power, shorts through unmodelled connections or real hardware wiring. The battery label is nominal and actual pack voltage varies. A missing warning does not mean a circuit is safe. Verify the exact board and module documentation before connecting or powering hardware.
+
 ## Sensor Atlas scope and limitations
 
 The Sensor Atlas is a static educational reference, not a hardware detector or live telemetry service. Its catalogue covers HC-SR04, HC-SR501 PIR, DHT11, DHT22/AM2302, BMP280, MPU-6050, DS18B20, LDR, capacitive soil-moisture modules, IR obstacle modules, BH1750 and SHT31. Search, category filtering, detail selection, copy-code controls and side-by-side comparison are client-side features; no account, AI service or backend is connected.
@@ -44,14 +50,14 @@ The Physics Lab is a simplified educational approximation, not a validated scien
 
 1. Improve the shared app foundation, responsive navigation and accessibility. The visual landing-page prototype is available in `ocunova-visuals.html`.
 2. Connect the 3D Workspace, Model Studio and Circuit Forge through a consistent project format — the shared `ocunova-project-v1` container now carries 3D scenes and visual circuit layouts; browser hand-off testing remains.
-3. Add documented pin maps and rule-based wiring guidance for supported Circuit Forge parts; keep this advisory until board variants and electrical rules are verified. Expand the sensor reference catalogue with additional documented parts and verified board variants; the first 12-sensor Sensor Atlas is now available.
+3. Continue expanding documented pin maps and board-specific variants. The initial label-level Circuit Forge Wiring Guide is implemented as advisory only; its rules need broader verified board coverage before stronger claims are possible. The first 12-sensor Sensor Atlas is available.
 4. Expand guided lessons and build a more complete, validated simulation layer.
 5. Add secure AI-assisted project generation only when a server-side integration is available.
 6. Add verified PDF/PPT project documentation exports.
 
-## Automated project-format tests
+## Automated project and wiring-guide tests
 
-Run `npm test` with Node.js 18 or later to execute the project-format regression suite. It uses Node's built-in test runner and has no third-party package dependencies. The suite now contains 18 cases covering canonical 3D-plus-circuit project creation and normalisation, legacy 3D and Circuit Forge exports, defaults, label cleaning, object and circuit limits, supported types, duplicate IDs and wires, color validation, finite positions and transforms, dangling connections and port-index bounds.
+Run `npm test` with Node.js 18 or later to execute both regression suites. They use Node's built-in test runner and have no third-party package dependencies. The repository contains 28 cases: 18 for canonical 3D-plus-circuit project creation and normalisation, legacy 3D and Circuit Forge exports, defaults, label cleaning, object and circuit limits, supported types, duplicate IDs and wires, color validation, finite positions and transforms, dangling connections and port-index bounds; plus 10 for wiring-guide warnings, recognised power/ground/signal labels, contextual notes and unclassified endpoints.
 
 ## Development and privacy principles
 
@@ -66,12 +72,12 @@ Run `npm test` with Node.js 18 or later to execute the project-format regression
 
 - Source files and commits are present on the `ocunova-revival` branch.
 - The Physics Lab source was fetched back from GitHub and checked for its experiment controls, run/pause logic, CSV export and model-limitations note.
-- The shared `project-format.js`, `workspace.html`, `model-studio.html` and `circuit-forge.html` files were fetched back from GitHub. Their module/inline app scripts passed V8 syntax parsing. All 18 project-format regression cases were executed in a V8 harness with a strict assertion shim, including canonical 3D-plus-circuit round-trips, legacy Circuit Forge pixel export conversion, legacy 3D compatibility, component/connection limits, and invalid or dangling wire rejection.
+- The shared `project-format.js`, `workspace.html`, `model-studio.html` and `circuit-forge.html` files were fetched back from GitHub. Their module/inline app scripts passed V8 syntax parsing. The 18 project-format regression cases were executed in a V8 harness with a strict assertion shim, including canonical 3D-plus-circuit round-trips, legacy Circuit Forge pixel export conversion, legacy 3D compatibility, component/connection limits, and invalid or dangling wire rejection.
 - The Guided Learning Path and updated landing page were fetched back from GitHub; their inline JavaScript passed V8 syntax parsing, five lesson modules and 15 tasks were confirmed, and the lesson tool destinations were checked against the repository entry points.
 - The Sensor Atlas and updated landing page were fetched back from GitHub. JavaScript syntax parsing passed for both inline scripts; the catalogue data check confirmed 12 unique entries with the required fields and starter examples.
-- The earlier 12-case version of the project-format suite had passed `npm test` with Node's built-in test runner. The expanded 18-case suite was exercised in the V8 harness during this milestone; `npm test` has not yet been rerun against the expanded suite.
+- The new `wiring-guide.js`, `tests/wiring-guide.test.mjs` and updated Circuit Forge module script were fetched back from GitHub and passed V8 syntax parsing. All 10 wiring-guide cases and all 18 project-format cases passed in a V8 harness with a strict assertion shim (28/28). The actual `npm test` command has not yet been run against this 28-case suite in Node.js.
 - The shared 3D-and-circuit project hand-off has not yet been browser-tested between pages. Manual export/import checks in a modern browser are still required; Three.js rendering additionally requires WebGL and network access to the CDN dependencies.
-- These are source-level and V8-harness checks only, not browser/device runtime tests. Circuit Forge has not been browser-tested for cross-page import/export, and its connections remain visual only. The Guided Learning Path has not been browser-tested across devices; local-storage persistence and interactions still need manual browser testing. The Sensor Atlas has not been browser-tested or connected to physical sensors; starter sketches have not been compiled against hardware.
+- These are source-level and V8-harness checks only, not browser/device runtime tests. The Wiring Guide has not been browser-tested or compared with physical circuits; its findings are advisory and label-based. Circuit Forge has not been browser-tested for cross-page import/export, and its connections remain visual only. The Guided Learning Path has not been browser-tested across devices; local-storage persistence and interactions still need manual browser testing. The Sensor Atlas has not been browser-tested or connected to physical sensors; starter sketches have not been compiled against hardware.
 - The Physics Lab has not yet been browser-tested across devices or independently validated against a physics reference.
 - The Three.js prototypes require a browser with WebGL and network access to their CDN dependencies.
 
