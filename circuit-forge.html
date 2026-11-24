@@ -75,9 +75,10 @@ function sharedCircuit(){
 }
 function loadCircuit(circuit){
   const maxX=Math.max(1,board.clientWidth-110),maxY=Math.max(1,board.clientHeight-85);
-  items=circuit.components.map(item=>({id:item.id,type:item.type,x:item.x*maxX,y:item.y*maxY}));
+  items=circuit.components.map(item=>({id:item.id,type:item.type,x:Math.max(0,Math.min(maxX,item.x*maxX)),y:Math.max(38,Math.min(maxY,item.y*maxY))}));
   wires=circuit.connections.map(wire=>({...wire}));
-  selected=null;pending=null;drag=null;undo=[];render();
+  selected=null;pending=null;drag=null;undo=[];mode="select";
+  $("selectMode").classList.add("active");$("wireMode").classList.remove("active");render();
 }
 $("exportBtn").onclick=()=>{
   const project=createOcuNovaProject(linkedObjects,projectName,sharedCircuit());
