@@ -94,11 +94,11 @@ test('returns an empty advisory report for an empty board without declaring it s
   assert.equal(report.summary.warning, 0);
 });
 
-test('counts unknown endpoints for manual review instead of treating them as checked', () => {
+test('counts unknown and passive endpoints for manual review instead of treating them as checked', () => {
   const report = analyzeCircuitWiring(circuit(
-    [part('uno', 'arduino')],
-    [wire('uno', 99, 'uno', 2)]
+    [part('uno', 'arduino'), part('r', 'resistor')],
+    [wire('uno', 99, 'uno', 2), wire('uno', 2, 'r', 0)]
   ));
-  assert.equal(report.unclassifiedConnections, 1);
-  assert.equal(report.reviewedConnections, 1);
+  assert.equal(report.unclassifiedConnections, 2);
+  assert.equal(report.reviewedConnections, 2);
 });
